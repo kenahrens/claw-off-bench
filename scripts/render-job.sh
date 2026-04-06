@@ -16,7 +16,21 @@ fi
 
 AGENT_ACTION="${AGENT_ACTION:-run}"
 
-JOB_NAME="${AGENT_NAME}-${TASK_ID}-$(date +%s)"
+sanitize_name_component() {
+  printf '%s' "$1" \
+    | tr '[:upper:]' '[:lower:]' \
+    | sed -E 's/[^a-z0-9.-]+/-/g; s/^[^a-z0-9]+//; s/[^a-z0-9]+$//; s/-+/-/g; s/\.+/./g'
+}
+
+safe_agent_name="$(sanitize_name_component "${AGENT_NAME}")"
+safe_task_id="$(sanitize_name_component "${TASK_ID}")"
+
+if [[ -z "${safe_agent_name}" || -z "${safe_task_id}" ]]; then
+  echo "error: AGENT_NAME and TASK_ID must contain at least one alphanumeric character" >&2
+  exit 1
+fi
+
+JOB_NAME="${safe_agent_name}-${safe_task_id}-$(date +%s)"
 export JOB_NAME AGENT_NAME AGENT_IMAGE TASK_ID TASK_INSTRUCTION AGENT_BIN AGENT_ACTION
 
 if [[ -n "${AGENT_TEMPLATE:-}" ]]; then

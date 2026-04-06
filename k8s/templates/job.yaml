@@ -28,6 +28,21 @@ spec:
                 secretKeyRef:
                   name: claw-secrets
                   key: llm_api_key
+            - name: OPENROUTER_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: claw-secrets
+                  key: llm_api_key
+            - name: OPENAI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: claw-secrets
+                  key: llm_api_key
+            - name: ANTHROPIC_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: claw-secrets
+                  key: llm_api_key
             - name: GITHUB_TOKEN
               valueFrom:
                 secretKeyRef:

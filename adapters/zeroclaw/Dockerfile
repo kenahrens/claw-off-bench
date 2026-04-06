@@ -1,10 +1,12 @@
-FROM alpine:3.20
+FROM birdxs/zeroclaw:latest AS zeroclaw-bin
 
-RUN addgroup -S app && adduser -S -G app app
+FROM ubuntu:24.04
 
-# Replace this with the actual zero-claw binary copy step for your image source.
-# Example:
-# COPY --from=ghcr.io/vendor/zero-claw:latest /usr/local/bin/zero-claw /usr/local/bin/zero-claw
+RUN groupadd --system app && useradd --system --gid app --create-home app
+
+COPY --from=zeroclaw-bin /usr/local/bin/zeroclaw /usr/local/bin/zeroclaw
+RUN printf '%s\n' '#!/bin/sh' 'set -eu' 'if [ "$#" -ge 2 ] && [ "$1" = "run" ]; then' '  shift' '  exec /usr/local/bin/zeroclaw agent -m "$*"' 'fi' 'exec /usr/local/bin/zeroclaw "$@"' > /usr/local/bin/zero-claw \
+  && chmod +x /usr/local/bin/zero-claw
 
 USER app
 WORKDIR /workspace
