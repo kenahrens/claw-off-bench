@@ -16,14 +16,6 @@ All runs execute with the same hard limits (`1 CPU`, `512Mi` memory), non-root s
 
 The benchmark matrix is tracked in `config/agents.csv`.
 
-| Agent | Stars | Runtime | Footprint | Use Case |
-|:--|:--|:--|:--|:--|
-| OpenClaw | 335k | Node.js | ~1.5GB | High-context legacy refactor |
-| Claw Code | 72k | Python/Rust | ~200MB | General-purpose coding |
-| ZeroClaw | 26k | Rust | <5MB | High-density factory work |
-| NanoClaw | 21k | TypeScript/Wasm | ~50MB | Secure/untrusted modules |
-| PicoClaw | 13k | Go | ~10MB | Fast edge execution |
-
 ## Repository Layout
 
 - `config/agents.csv`: runtime matrix and image/template mapping.
@@ -58,11 +50,14 @@ The policy resolves current A records and restricts agent pods (`app=claw-runner
 ## Quickstart
 
 1. Set context with `kubectl config use-context minikube` and verify with `kubectl config current-context`.
-2. Apply base resources with `make setup`, then copy `k8s/base/secrets.template.yaml` to `k8s/base/secrets.yaml`, fill real tokens, and apply it.
-3. Apply the egress cage with `make setup-egress` (set `ALLOW_PACKAGE_REGISTRIES=true` only when dependency downloads are required).
-4. Run one benchmark job with `make run` using `AGENT_NAME`, `AGENT_IMAGE`, `TASK_ID`, and `TASK_INSTRUCTION` env vars.
-5. Run the full matrix with repeats using `REPEAT_COUNT=3 make run-matrix`.
-6. Collect all run logs with `make collect`.
+2. Apply base resources with `make setup`.
+3. Apply credentials with `make setup-secrets` after exporting `LLM_API_KEY` (or `OPENROUTER_API_KEY`) and `GITHUB_TOKEN`.
+4. Sync repository contents into the workspace PVC with `make sync-workspace`.
+5. Apply the egress cage with `make setup-egress` (set `ALLOW_PACKAGE_REGISTRIES=true` only when dependency downloads are required).
+6. Build the ZeroClaw adapter image into the Minikube image store with `make build-zeroclaw-adapter`.
+7. Run one benchmark job with `make run` using `AGENT_NAME`, `AGENT_IMAGE`, `TASK_ID`, and `TASK_INSTRUCTION` env vars (set `WAIT_TIMEOUT` to cap wait duration per run).
+8. Run the full matrix with repeats using `REPEAT_COUNT=3 make run-matrix` (set `AGENT_FILTER=zeroclaw` to run a subset).
+9. Collect all run logs with `make collect`.
 
 ## Notes
 

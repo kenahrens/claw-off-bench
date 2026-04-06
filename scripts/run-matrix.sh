@@ -3,6 +3,7 @@ set -euo pipefail
 
 matrix_file="${AGENT_MATRIX_FILE:-config/agents.csv}"
 repeat_count="${REPEAT_COUNT:-1}"
+agent_filter="${AGENT_FILTER:-}"
 
 if [[ ! -f "${matrix_file}" ]]; then
   echo "error: agent matrix file not found: ${matrix_file}" >&2
@@ -38,6 +39,12 @@ runs=0
 
 while IFS=',' read -r agent _stars _runtime _footprint _use_case image template bin; do
   [[ -z "${agent}" ]] && continue
+
+  if [[ -n "${agent_filter}" ]]; then
+    if [[ ",${agent_filter}," != *",${agent},"* ]]; then
+      continue
+    fi
+  fi
 
   for task_row in "${task_rows[@]}"; do
     task_id="${task_row%%$'\t'*}"

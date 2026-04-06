@@ -1,15 +1,24 @@
 SHELL := /bin/bash
 
-.PHONY: setup setup-egress run run-matrix collect
+.PHONY: setup setup-secrets sync-workspace setup-egress build-zeroclaw-adapter run run-matrix collect
 
 setup:
 	kubectl apply -f k8s/base/namespace.yaml
 	kubectl apply -f k8s/base/pvc.yaml
 	kubectl apply -f k8s/base/networkpolicy.yaml
-	@echo "Create and apply k8s/base/secrets.yaml from template before running jobs."
+	@echo "Run make setup-secrets and make sync-workspace before benchmark jobs."
+
+setup-secrets:
+	./scripts/setup-secrets.sh
+
+sync-workspace:
+	./scripts/sync-workspace.sh
 
 setup-egress:
 	./scripts/apply-egress-policy.sh
+
+build-zeroclaw-adapter:
+	eval "$$(minikube docker-env)" && docker build -t zeroclaw-adapter:latest adapters/zeroclaw
 
 run:
 	./scripts/run-task.sh
