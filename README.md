@@ -55,9 +55,25 @@ The policy resolves current A records and restricts agent pods (`app=claw-runner
 4. Sync repository contents into the workspace PVC with `make sync-workspace`.
 5. Apply the egress cage with `make setup-egress` (set `ALLOW_PACKAGE_REGISTRIES=true` only when dependency downloads are required).
 6. Build the ZeroClaw adapter image into the Minikube image store with `make build-zeroclaw-adapter`.
-7. Run one benchmark job with `make run` using `AGENT_NAME`, `AGENT_IMAGE`, `TASK_ID`, and `TASK_INSTRUCTION` env vars (set `WAIT_TIMEOUT` to cap wait duration per run).
-8. Run the full matrix with repeats using `REPEAT_COUNT=3 make run-matrix` (set `AGENT_FILTER=zeroclaw` to run a subset).
-9. Collect all run logs with `make collect`.
+7. List standard benchmark aliases with `make tasks`.
+8. Run one benchmark job with `make run-task-1` (or `make run-task-2`, etc.) after setting `AGENT_NAME` and `AGENT_IMAGE`; set `WAIT_TIMEOUT` to cap wait duration per run.
+9. You can still run with explicit task fields using `make run` and `TASK_REF`, or `TASK_ID` + `TASK_INSTRUCTION`.
+10. Run the full matrix with repeats using `REPEAT_COUNT=3 make run-matrix` (set `AGENT_FILTER=zeroclaw` to run a subset).
+11. Collect all run logs with `make collect`.
+
+## Daemon Mode (ZeroClaw)
+
+Use daemon mode as a separate benchmark track for steady-state service behavior.
+
+1. Deploy and pair the daemon with `make deploy-daemon`.
+2. Submit a task over HTTP with `make daemon-task-1` (or `make daemon-task-2`, etc.).
+3. Repeat task submissions as needed; each response is stored under `results/`.
+4. Tear down daemon resources with `make remove-daemon`.
+
+Notes:
+
+- Daemon mode preserves runtime state between requests; do not mix its results with cold-start job runs.
+- Daemon auth token is stored in Kubernetes secret `${DAEMON_NAME:-zeroclaw-daemon}-auth`.
 
 ## Notes
 

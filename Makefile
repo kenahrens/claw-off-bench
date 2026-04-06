@@ -1,6 +1,6 @@
 SHELL := /bin/bash
 
-.PHONY: setup setup-secrets sync-workspace setup-egress build-zeroclaw-adapter run run-matrix collect
+.PHONY: setup setup-secrets sync-workspace setup-egress build-zeroclaw-adapter tasks deploy-daemon submit-daemon-task remove-daemon run run-matrix collect
 
 setup:
 	kubectl apply -f k8s/base/namespace.yaml
@@ -20,6 +20,23 @@ setup-egress:
 build-zeroclaw-adapter:
 	eval "$$(minikube docker-env)" && docker build -t zeroclaw-adapter:latest adapters/zeroclaw
 
+tasks:
+	./scripts/list-tasks.sh
+
+deploy-daemon:
+	./scripts/deploy-daemon.sh
+
+submit-daemon-task:
+	./scripts/submit-daemon-task.sh
+
+remove-daemon:
+	./scripts/remove-daemon.sh
+
+run-task-%:
+	TASK_REF=TASK_$* ./scripts/run-task.sh
+
+daemon-task-%:
+	TASK_REF=TASK_$* ./scripts/submit-daemon-task.sh
 run:
 	./scripts/run-task.sh
 

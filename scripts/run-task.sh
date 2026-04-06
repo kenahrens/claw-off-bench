@@ -3,6 +3,13 @@ set -euo pipefail
 
 wait_timeout="${WAIT_TIMEOUT:-30m}"
 
+IFS=$'\t' read -r resolved_task_id resolved_task_instruction < <(
+  TASK_REF="${TASK_REF:-}" TASK_ID="${TASK_ID:-}" TASK_INSTRUCTION="${TASK_INSTRUCTION:-}" ./scripts/resolve-task.sh
+)
+
+TASK_ID="${resolved_task_id}"
+TASK_INSTRUCTION="${resolved_task_instruction}"
+export TASK_ID TASK_INSTRUCTION
 if [[ "$(kubectl config current-context)" != "minikube" ]]; then
   echo "warning: current kubectl context is not minikube"
 fi
