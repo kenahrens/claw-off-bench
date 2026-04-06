@@ -9,3 +9,8 @@
 - [x] Add matrix orchestration script to run all agents against the task suite with repeat support.
 - [x] Update operator workflow in README for setup, egress policy application, single run, matrix run, and log collection.
 - [x] Validate changed scripts and manifests in-repo before handoff.
+- [x] Add setup hardening to require real credentials and prevent placeholder secret runs.
+- [x] Add workspace sync automation so benchmark jobs run against the expected repository contents.
+- [x] Add ZeroClaw daemon-mode benchmark track using Kubernetes deployment + service templates.
+- [x] Add daemon lifecycle scripts to deploy/pair, submit HTTP tasks, and remove daemon resources.
+- [x] Document daemon-mode workflow in README as a separate steady-state benchmark path.

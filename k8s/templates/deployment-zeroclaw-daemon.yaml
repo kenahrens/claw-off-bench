@@ -1,0 +1,84 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ${DAEMON_NAME}
+  namespace: claw-bench
+  labels:
+    app: ${DAEMON_NAME}
+    claw.agent: zeroclaw
+    claw.mode: daemon
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ${DAEMON_NAME}
+  template:
+    metadata:
+      labels:
+        app: ${DAEMON_NAME}
+        claw.agent: zeroclaw
+        claw.mode: daemon
+    spec:
+      restartPolicy: Always
+      containers:
+        - name: zeroclaw-daemon
+          image: ${AGENT_IMAGE}
+          imagePullPolicy: IfNotPresent
+          workingDir: /workspace
+          command: ["zero-claw", "daemon", "-p", "${DAEMON_PORT}", "--host", "127.0.0.1"]
+          ports:
+            - containerPort: ${DAEMON_PORT}
+              protocol: TCP
+          env:
+            - name: LLM_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: claw-secrets
+                  key: llm_api_key
+            - name: OPENROUTER_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: claw-secrets
+                  key: llm_api_key
+            - name: OPENAI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: claw-secrets
+                  key: llm_api_key
+            - name: ANTHROPIC_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: claw-secrets
+                  key: llm_api_key
+            - name: GITHUB_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: claw-secrets
+                  key: github_token
+          resources:
+            requests:
+              cpu: "1"
+              memory: "512Mi"
+            limits:
+              cpu: "1"
+              memory: "512Mi"
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
+            capabilities:
+              drop: ["ALL"]
+            seccompProfile:
+              type: RuntimeDefault
+          volumeMounts:
+            - name: workspace
+              mountPath: /workspace
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: workspace
+          persistentVolumeClaim:
+            claimName: claw-workspace
+        - name: tmp
+          emptyDir: {}

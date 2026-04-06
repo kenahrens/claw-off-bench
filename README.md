@@ -59,6 +59,20 @@ The policy resolves current A records and restricts agent pods (`app=claw-runner
 8. Run the full matrix with repeats using `REPEAT_COUNT=3 make run-matrix` (set `AGENT_FILTER=zeroclaw` to run a subset).
 9. Collect all run logs with `make collect`.
 
+## Daemon Mode (ZeroClaw)
+
+Use daemon mode as a separate benchmark track for steady-state service behavior.
+
+1. Deploy and pair the daemon with `make deploy-daemon`.
+2. Submit a task over HTTP with `TASK_INSTRUCTION="..." make submit-daemon-task`.
+3. Repeat task submissions as needed; each response is stored under `results/`.
+4. Tear down daemon resources with `make remove-daemon`.
+
+Notes:
+
+- Daemon mode preserves runtime state between requests; do not mix its results with cold-start job runs.
+- Daemon auth token is stored in Kubernetes secret `${DAEMON_NAME:-zeroclaw-daemon}-auth`.
+
 ## Notes
 
 - Use `k8s/templates/job-zeroclaw.yaml` when the default template fails due to stricter runtime assumptions.
