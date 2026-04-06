@@ -21,7 +21,7 @@ spec:
           image: ${AGENT_IMAGE}
           imagePullPolicy: IfNotPresent
           workingDir: /workspace
-          command: ["zero-claw", "run", "${TASK_INSTRUCTION}"]
+          command: ["${AGENT_BIN}", "${AGENT_ACTION}", "${TASK_INSTRUCTION}"]
           env:
             - name: LLM_API_KEY
               valueFrom:
