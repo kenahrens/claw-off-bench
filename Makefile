@@ -1,6 +1,6 @@
 SHELL := /bin/bash
 
-.PHONY: setup setup-secrets sync-workspace setup-egress build-zeroclaw-adapter tasks deploy-daemon submit-daemon-task remove-daemon run run-matrix collect
+.PHONY: setup setup-secrets sync-workspace setup-egress build-zeroclaw-adapter tasks easy deploy-daemon submit-daemon-task remove-daemon run run-matrix collect
 
 setup:
 	kubectl apply -f k8s/base/namespace.yaml
@@ -37,6 +37,10 @@ run-task-%:
 
 daemon-task-%:
 	TASK_REF=TASK_$* ./scripts/submit-daemon-task.sh
+
+easy:
+	./scripts/easy-button.sh
+
 run:
 	./scripts/run-task.sh
 

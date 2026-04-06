@@ -2,6 +2,7 @@
 set -euo pipefail
 
 wait_timeout="${WAIT_TIMEOUT:-30m}"
+require_github_token="${REQUIRE_GITHUB_TOKEN:-false}"
 
 IFS=$'\t' read -r resolved_task_id resolved_task_instruction < <(
   TASK_REF="${TASK_REF:-}" TASK_ID="${TASK_ID:-}" TASK_INSTRUCTION="${TASK_INSTRUCTION:-}" ./scripts/resolve-task.sh
@@ -22,9 +23,11 @@ if [[ -z "${llm_key_b64}" || "${llm_key_b64}" == "ZHVtbXk=" || "${llm_key_b64}" 
   exit 1
 fi
 
-if [[ -z "${github_token_b64}" || "${github_token_b64}" == "ZHVtbXk=" || "${github_token_b64}" == "UkVQTEFDRV9NRQ==" ]]; then
-  echo "error: claw-secrets.github_token is missing or placeholder; apply real credentials before running jobs" >&2
-  exit 1
+if [[ "${require_github_token}" == "true" ]]; then
+  if [[ -z "${github_token_b64}" || "${github_token_b64}" == "ZHVtbXk=" || "${github_token_b64}" == "UkVQTEFDRV9NRQ==" ]]; then
+    echo "error: claw-secrets.github_token is missing or placeholder; apply real credentials before running jobs" >&2
+    exit 1
+  fi
 fi
 
 manifest="$(./scripts/render-job.sh)"
