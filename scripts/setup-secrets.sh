@@ -4,6 +4,7 @@ set -euo pipefail
 namespace="${NAMESPACE:-claw-bench}"
 llm_api_key="${LLM_API_KEY:-${OPENROUTER_API_KEY:-}}"
 github_token="${GITHUB_TOKEN:-}"
+require_github_token="${REQUIRE_GITHUB_TOKEN:-false}"
 
 if [[ -z "${llm_api_key}" ]]; then
   echo "error: set LLM_API_KEY (or OPENROUTER_API_KEY) before running setup-secrets" >&2
@@ -11,8 +12,12 @@ if [[ -z "${llm_api_key}" ]]; then
 fi
 
 if [[ -z "${github_token}" ]]; then
-  echo "error: set GITHUB_TOKEN before running setup-secrets" >&2
-  exit 1
+  if [[ "${require_github_token}" == "true" ]]; then
+    echo "error: set GITHUB_TOKEN before running setup-secrets" >&2
+    exit 1
+  fi
+  github_token="chat-only-not-used"
+  echo "warning: GITHUB_TOKEN not set; using chat-only placeholder token" >&2
 fi
 
 if [[ "${llm_api_key}" == "dummy" || "${llm_api_key}" == "REPLACE_ME" ]]; then

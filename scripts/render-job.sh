@@ -16,6 +16,14 @@ fi
 
 AGENT_ACTION="${AGENT_ACTION:-run}"
 
+if [[ "${AGENT_NAME}" == "zeroclaw" ]]; then
+  DEFAULT_PROVIDER="${DEFAULT_PROVIDER:-openrouter}"
+  DEFAULT_MODEL="${DEFAULT_MODEL:-nvidia/nemotron-3-super-120b-a12b:free}"
+else
+  DEFAULT_PROVIDER="${DEFAULT_PROVIDER:-}"
+  DEFAULT_MODEL="${DEFAULT_MODEL:-}"
+fi
+
 sanitize_name_component() {
   printf '%s' "$1" \
     | tr '[:upper:]' '[:lower:]' \
@@ -31,7 +39,7 @@ if [[ -z "${safe_agent_name}" || -z "${safe_task_id}" ]]; then
 fi
 
 JOB_NAME="${safe_agent_name}-${safe_task_id}-$(date +%s)"
-export JOB_NAME AGENT_NAME AGENT_IMAGE TASK_ID TASK_INSTRUCTION AGENT_BIN AGENT_ACTION
+export JOB_NAME AGENT_NAME AGENT_IMAGE TASK_ID TASK_INSTRUCTION AGENT_BIN AGENT_ACTION DEFAULT_PROVIDER DEFAULT_MODEL
 
 if [[ -n "${AGENT_TEMPLATE:-}" ]]; then
   TEMPLATE="${AGENT_TEMPLATE}"

@@ -49,6 +49,16 @@ The policy resolves current A records and restricts agent pods (`app=claw-runner
 
 ## Quickstart
 
+Single command (job mode, task 1):
+
+`OPENROUTER_API_KEY=... make easy`
+
+Optional overrides:
+
+- `TASK_REF=TASK_2 make easy`
+- `EASY_MODE=daemon TASK_REF=TASK_1 make easy`
+- `DEFAULT_MODEL=nvidia/nemotron-3-super-120b-a12b:free make easy`
+
 1. Set context with `kubectl config use-context minikube` and verify with `kubectl config current-context`.
 2. Apply base resources with `make setup`.
 3. Apply credentials with `make setup-secrets` after exporting `LLM_API_KEY` (or `OPENROUTER_API_KEY`) and `GITHUB_TOKEN`.

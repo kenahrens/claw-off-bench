@@ -35,6 +35,16 @@ spec:
                 secretKeyRef:
                   name: claw-secrets
                   key: llm_api_key
+            - name: API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: claw-secrets
+                  key: llm_api_key
+            - name: ZEROCLAW_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: claw-secrets
+                  key: llm_api_key
             - name: OPENROUTER_API_KEY
               valueFrom:
                 secretKeyRef:
@@ -55,6 +65,10 @@ spec:
                 secretKeyRef:
                   name: claw-secrets
                   key: github_token
+            - name: ZEROCLAW_DEFAULT_PROVIDER
+              value: "${DEFAULT_PROVIDER}"
+            - name: ZEROCLAW_DEFAULT_MODEL
+              value: "${DEFAULT_MODEL}"
           resources:
             requests:
               cpu: "1"
