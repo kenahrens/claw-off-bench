@@ -53,11 +53,16 @@ Single command (job mode, task 1):
 
 `OPENROUTER_API_KEY=... make easy`
 
+Single command (matrix mode, default `zeroclaw`, 1 repeat):
+
+`OPENROUTER_API_KEY=... make easy-matrix`
+
 Optional overrides:
 
 - `TASK_REF=TASK_2 make easy`
 - `EASY_MODE=daemon TASK_REF=TASK_1 make easy`
 - `DEFAULT_MODEL=nvidia/nemotron-3-super-120b-a12b:free make easy`
+- `AGENT_FILTER=zeroclaw REPEAT_COUNT=3 make easy-matrix`
 
 1. Set context with `kubectl config use-context minikube` and verify with `kubectl config current-context`.
 2. Apply base resources with `make setup`.
