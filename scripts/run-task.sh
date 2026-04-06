@@ -10,7 +10,6 @@ IFS=$'\t' read -r resolved_task_id resolved_task_instruction < <(
 TASK_ID="${resolved_task_id}"
 TASK_INSTRUCTION="${resolved_task_instruction}"
 export TASK_ID TASK_INSTRUCTION
-
 if [[ "$(kubectl config current-context)" != "minikube" ]]; then
   echo "warning: current kubectl context is not minikube"
 fi

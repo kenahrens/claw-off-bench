@@ -37,7 +37,6 @@ run-task-%:
 
 daemon-task-%:
 	TASK_REF=TASK_$* ./scripts/submit-daemon-task.sh
-
 run:
 	./scripts/run-task.sh
 
