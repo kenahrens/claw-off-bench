@@ -20,6 +20,7 @@ The benchmark matrix is tracked in `config/agents.csv`.
 
 - `config/agents.csv`: runtime matrix and image/template mapping.
 - `config/agents-capabilities.csv`: per-agent command/interaction capability manifest.
+- `config/agents-safety.csv`: per-agent timeout, approval mode, and tool-iteration policy.
 - `config/eval.env`: checked-in run profile for one-command evaluation.
 - `tasks/tasks.yaml`: benchmark task suite.
 - `k8s/base`: namespace, PVC, secrets template, baseline deny policy.
@@ -53,10 +54,11 @@ The policy resolves current A records and restricts agent pods (`app=claw-runner
 
 Use only these commands:
 
-1. `make bench-init` - one-time bootstrap + verify cluster secrets.
-2. `make bench-smoke` - cheap single-task canary.
-3. `make bench-run` - full clean end-to-end comparison run.
-4. `make bench-report` - collect + score latest artifacts.
+1. `make validate` - fast non-cluster validation (scripts/config/render checks).
+2. `make bench-init` - one-time bootstrap + verify cluster secrets.
+3. `make bench-smoke` - cheap synthetic canary (expects `SMOKE_OK`).
+4. `make bench-run` - full clean end-to-end comparison run.
+5. `make bench-report` - collect + score latest artifacts.
 
 Optional helper commands:
 

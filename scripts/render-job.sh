@@ -15,13 +15,31 @@ if [[ -z "${AGENT_BIN:-}" ]]; then
 fi
 
 AGENT_ACTION="${AGENT_ACTION:-run}"
+RESOURCE_CPU_REQUEST="${RESOURCE_CPU_REQUEST:-1}"
+RESOURCE_CPU_LIMIT="${RESOURCE_CPU_LIMIT:-1}"
+RESOURCE_MEMORY_REQUEST="${RESOURCE_MEMORY_REQUEST:-512Mi}"
+RESOURCE_MEMORY_LIMIT="${RESOURCE_MEMORY_LIMIT:-512Mi}"
 
 if [[ "${AGENT_NAME}" == "zeroclaw" ]]; then
   DEFAULT_PROVIDER="${DEFAULT_PROVIDER:-openai}"
   DEFAULT_MODEL="${DEFAULT_MODEL:-gpt-5-mini}"
+  MAX_TOOL_ITERATIONS="${MAX_TOOL_ITERATIONS:-40}"
+  APPROVAL_MODE="${APPROVAL_MODE:-default}"
+
+  if ! [[ "${MAX_TOOL_ITERATIONS}" =~ ^[0-9]+$ ]] || [[ "${MAX_TOOL_ITERATIONS}" -lt 1 ]]; then
+    echo "error: MAX_TOOL_ITERATIONS must be a positive integer" >&2
+    exit 1
+  fi
+
+  if ! [[ "${APPROVAL_MODE}" =~ ^(default|strict|none)$ ]]; then
+    echo "error: APPROVAL_MODE must be default, strict, or none" >&2
+    exit 1
+  fi
 else
   DEFAULT_PROVIDER="${DEFAULT_PROVIDER:-}"
   DEFAULT_MODEL="${DEFAULT_MODEL:-}"
+  MAX_TOOL_ITERATIONS=""
+  APPROVAL_MODE=""
 fi
 
 sanitize_name_component() {
@@ -39,7 +57,7 @@ if [[ -z "${safe_agent_name}" || -z "${safe_task_id}" ]]; then
 fi
 
 JOB_NAME="${safe_agent_name}-${safe_task_id}-$(date +%s)"
-export JOB_NAME AGENT_NAME AGENT_IMAGE TASK_ID TASK_INSTRUCTION AGENT_BIN AGENT_ACTION DEFAULT_PROVIDER DEFAULT_MODEL
+export JOB_NAME AGENT_NAME AGENT_IMAGE TASK_ID TASK_INSTRUCTION AGENT_BIN AGENT_ACTION DEFAULT_PROVIDER DEFAULT_MODEL MAX_TOOL_ITERATIONS APPROVAL_MODE RESOURCE_CPU_REQUEST RESOURCE_CPU_LIMIT RESOURCE_MEMORY_REQUEST RESOURCE_MEMORY_LIMIT
 
 if [[ -n "${AGENT_TEMPLATE:-}" ]]; then
   TEMPLATE="${AGENT_TEMPLATE}"

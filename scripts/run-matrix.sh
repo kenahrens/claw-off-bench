@@ -2,6 +2,7 @@
 set -euo pipefail
 
 matrix_file="${AGENT_MATRIX_FILE:-config/agents.csv}"
+safety_file="${AGENT_SAFETY_FILE:-config/agents-safety.csv}"
 repeat_count="${REPEAT_COUNT:-1}"
 agent_filter="${AGENT_FILTER:-}"
 matrix_strict="${MATRIX_STRICT:-false}"
@@ -9,6 +10,11 @@ preflight_only="${PREFLIGHT_ONLY:-false}"
 
 if [[ ! -f "${matrix_file}" ]]; then
   echo "error: agent matrix file not found: ${matrix_file}" >&2
+  exit 1
+fi
+
+if [[ ! -f "${safety_file}" ]]; then
+  echo "error: agent safety file not found: ${safety_file}" >&2
   exit 1
 fi
 
@@ -121,6 +127,42 @@ runs=0
 for row in "${available_rows[@]}"; do
   IFS=',' read -r agent image template bin <<< "${row}"
 
+  safety_row="$(awk -F',' -v agent="${agent}" 'NR > 1 && $1 == agent { print $0; exit }' "${safety_file}")"
+
+  if [[ -z "${safety_row}" ]]; then
+    echo "error: missing safety policy for agent ${agent} in ${safety_file}" >&2
+    exit 1
+  fi
+
+  IFS=',' read -r _policy_agent agent_wait_timeout agent_max_tool_iterations agent_approval_mode agent_cpu_request agent_cpu_limit agent_memory_request agent_memory_limit _policy_notes <<< "${safety_row}"
+
+  if [[ -z "${agent_wait_timeout}" ]]; then
+    echo "error: missing wait_timeout safety policy for agent ${agent}" >&2
+    exit 1
+  fi
+
+  if [[ -z "${agent_approval_mode}" ]]; then
+    echo "error: missing approval_mode safety policy for agent ${agent}" >&2
+    exit 1
+  fi
+
+  if ! [[ "${agent_approval_mode}" =~ ^(default|strict|none)$ ]]; then
+    echo "error: invalid approval_mode '${agent_approval_mode}' for agent ${agent}" >&2
+    exit 1
+  fi
+
+  if [[ -n "${agent_max_tool_iterations}" ]]; then
+    if ! [[ "${agent_max_tool_iterations}" =~ ^[0-9]+$ ]] || [[ "${agent_max_tool_iterations}" -lt 1 ]]; then
+      echo "error: invalid max_tool_iterations '${agent_max_tool_iterations}' for agent ${agent}" >&2
+      exit 1
+    fi
+  fi
+
+  if [[ -z "${agent_cpu_request}" || -z "${agent_cpu_limit}" || -z "${agent_memory_request}" || -z "${agent_memory_limit}" ]]; then
+    echo "error: missing resource safety policy for agent ${agent}" >&2
+    exit 1
+  fi
+
   for task_row in "${task_rows[@]}"; do
     task_id="${task_row%%$'\t'*}"
     task_instruction="${task_row#*$'\t'}"
@@ -135,6 +177,13 @@ for row in "${available_rows[@]}"; do
         AGENT_IMAGE="${image}" \
         AGENT_TEMPLATE="${template}" \
         AGENT_BIN="${bin}" \
+        WAIT_TIMEOUT="${agent_wait_timeout}" \
+        MAX_TOOL_ITERATIONS="${agent_max_tool_iterations}" \
+        APPROVAL_MODE="${agent_approval_mode}" \
+        RESOURCE_CPU_REQUEST="${agent_cpu_request}" \
+        RESOURCE_CPU_LIMIT="${agent_cpu_limit}" \
+        RESOURCE_MEMORY_REQUEST="${agent_memory_request}" \
+        RESOURCE_MEMORY_LIMIT="${agent_memory_limit}" \
         TASK_ID="${run_task_id}" \
         TASK_INSTRUCTION="${task_instruction}" \
         ./scripts/run-task.sh; then

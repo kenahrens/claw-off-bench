@@ -23,6 +23,8 @@ spec:
           workingDir: /workspace
           command: ["${AGENT_BIN}", "${AGENT_ACTION}", "${TASK_INSTRUCTION}"]
           env:
+            - name: HOME
+              value: /home/node
             - name: LLM_API_KEY
               valueFrom:
                 secretKeyRef:
@@ -64,11 +66,11 @@ spec:
               value: "${DEFAULT_MODEL}"
           resources:
             requests:
-              cpu: "1"
-              memory: "512Mi"
+              cpu: "${RESOURCE_CPU_REQUEST}"
+              memory: "${RESOURCE_MEMORY_REQUEST}"
             limits:
-              cpu: "1"
-              memory: "512Mi"
+              cpu: "${RESOURCE_CPU_LIMIT}"
+              memory: "${RESOURCE_MEMORY_LIMIT}"
           securityContext:
             runAsNonRoot: true
             runAsUser: 1000
@@ -83,9 +85,13 @@ spec:
               mountPath: /workspace
             - name: tmp
               mountPath: /tmp
+            - name: home
+              mountPath: /home/node
       volumes:
         - name: workspace
           persistentVolumeClaim:
             claimName: claw-workspace
         - name: tmp
+          emptyDir: {}
+        - name: home
           emptyDir: {}

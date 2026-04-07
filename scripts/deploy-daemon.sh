@@ -8,8 +8,24 @@ local_port="${DAEMON_LOCAL_PORT:-18787}"
 agent_image="${AGENT_IMAGE:-zeroclaw-adapter:latest}"
 default_provider="${DEFAULT_PROVIDER:-openai}"
 default_model="${DEFAULT_MODEL:-gpt-5-mini}"
+max_tool_iterations="${MAX_TOOL_ITERATIONS:-40}"
+approval_mode="${APPROVAL_MODE:-default}"
+resource_cpu_request="${RESOURCE_CPU_REQUEST:-1}"
+resource_cpu_limit="${RESOURCE_CPU_LIMIT:-1}"
+resource_memory_request="${RESOURCE_MEMORY_REQUEST:-512Mi}"
+resource_memory_limit="${RESOURCE_MEMORY_LIMIT:-512Mi}"
 
-export DAEMON_NAME="${daemon_name}" DAEMON_PORT="${daemon_port}" AGENT_IMAGE="${agent_image}" DEFAULT_PROVIDER="${default_provider}" DEFAULT_MODEL="${default_model}"
+if ! [[ "${max_tool_iterations}" =~ ^[0-9]+$ ]] || [[ "${max_tool_iterations}" -lt 1 ]]; then
+  echo "error: MAX_TOOL_ITERATIONS must be a positive integer" >&2
+  exit 1
+fi
+
+if ! [[ "${approval_mode}" =~ ^(default|strict|none)$ ]]; then
+  echo "error: APPROVAL_MODE must be default, strict, or none" >&2
+  exit 1
+fi
+
+export DAEMON_NAME="${daemon_name}" DAEMON_PORT="${daemon_port}" AGENT_IMAGE="${agent_image}" DEFAULT_PROVIDER="${default_provider}" DEFAULT_MODEL="${default_model}" MAX_TOOL_ITERATIONS="${max_tool_iterations}" APPROVAL_MODE="${approval_mode}" RESOURCE_CPU_REQUEST="${resource_cpu_request}" RESOURCE_CPU_LIMIT="${resource_cpu_limit}" RESOURCE_MEMORY_REQUEST="${resource_memory_request}" RESOURCE_MEMORY_LIMIT="${resource_memory_limit}"
 
 envsubst < k8s/templates/deployment-zeroclaw-daemon.yaml | kubectl apply -f -
 envsubst < k8s/templates/service-zeroclaw-daemon.yaml | kubectl apply -f -

@@ -69,13 +69,17 @@ spec:
               value: "${DEFAULT_PROVIDER}"
             - name: ZEROCLAW_DEFAULT_MODEL
               value: "${DEFAULT_MODEL}"
+            - name: ZEROCLAW_MAX_TOOL_ITERATIONS
+              value: "${MAX_TOOL_ITERATIONS}"
+            - name: ZEROCLAW_APPROVAL_MODE
+              value: "${APPROVAL_MODE}"
           resources:
             requests:
-              cpu: "1"
-              memory: "512Mi"
+              cpu: "${RESOURCE_CPU_REQUEST}"
+              memory: "${RESOURCE_MEMORY_REQUEST}"
             limits:
-              cpu: "1"
-              memory: "512Mi"
+              cpu: "${RESOURCE_CPU_LIMIT}"
+              memory: "${RESOURCE_MEMORY_LIMIT}"
           securityContext:
             runAsNonRoot: true
             runAsUser: 1000
