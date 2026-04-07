@@ -1,6 +1,6 @@
 SHELL := /bin/bash
 
-.PHONY: setup setup-secrets check-secrets sync-workspace setup-egress build-zeroclaw-adapter bootstrap clean-bench setup-stage compare validate bench-help bench-init bench-smoke bench-run bench-reset bench-report factory-summary preflight-gate tasks easy eval factory easy-matrix matrix-preflight deploy-daemon submit-daemon-task remove-daemon run run-matrix collect score
+.PHONY: setup setup-secrets check-secrets sync-workspace setup-egress build-zeroclaw-adapter bootstrap clean-bench setup-stage compare validate bench-help bench-init bench-smoke bench-run bench-reset bench-report factory-summary preflight-gate doctor tasks easy eval factory easy-matrix matrix-preflight deploy-daemon submit-daemon-task remove-daemon run run-matrix collect score
 
 setup:
 	kubectl apply -f k8s/base/namespace.yaml
@@ -75,6 +75,9 @@ factory-summary:
 
 preflight-gate:
 	./scripts/preflight-gate.sh
+
+doctor:
+	./scripts/doctor.sh
 
 bench-reset:
 	make clean-bench
