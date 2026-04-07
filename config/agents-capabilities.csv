@@ -1,0 +1,6 @@
+agent,entrypoint,task_mode,interactive_behavior,requires_provider_flag,requires_model_flag,approval_bypass_flag,max_tool_iterations_flag,notes
+openclaw,claw-cli,run,non-interactive,false,false,false,false,Uses default claw-cli run contract from job template.
+claw-code,claw-cli,run,non-interactive,false,false,false,false,Uses default claw-cli run contract from job template.
+zeroclaw,zero-claw,run,non-interactive,true,true,false,true,Adapter injects provider/model and supports max tool iteration tuning.
+nanoclaw,claw-cli,run,non-interactive,false,false,false,false,Uses default claw-cli run contract from job template.
+picoclaw,claw-cli,run,non-interactive,false,false,false,false,Uses default claw-cli run contract from job template.

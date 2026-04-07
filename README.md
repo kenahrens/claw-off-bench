@@ -19,6 +19,7 @@ The benchmark matrix is tracked in `config/agents.csv`.
 ## Repository Layout
 
 - `config/agents.csv`: runtime matrix and image/template mapping.
+- `config/agents-capabilities.csv`: per-agent command/interaction capability manifest.
 - `config/eval.env`: checked-in run profile for one-command evaluation.
 - `tasks/tasks.yaml`: benchmark task suite.
 - `k8s/base`: namespace, PVC, secrets template, baseline deny policy.
