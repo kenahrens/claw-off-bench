@@ -18,3 +18,4 @@
 - [x] Add make targets for indexed job and daemon task runs without per-run instruction env vars.
 - [x] Add an easy-button workflow that performs setup + run with sensible defaults in one command.
 - [x] Add an easy matrix workflow that runs setup + matrix execution in one command.
+- [x] Add benchmark scoring workflow for success rate, median, and p95 from `results/` artifacts.

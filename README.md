@@ -75,6 +75,7 @@ Optional overrides:
 9. You can still run with explicit task fields using `make run` and `TASK_REF`, or `TASK_ID` + `TASK_INSTRUCTION`.
 10. Run the full matrix with repeats using `REPEAT_COUNT=3 make run-matrix` (set `AGENT_FILTER=zeroclaw` to run a subset).
 11. Collect all run logs with `make collect`.
+12. Score current artifacts with `make score` (writes `results/score.json`).
 
 ## Daemon Mode (ZeroClaw)
 

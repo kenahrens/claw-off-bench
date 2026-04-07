@@ -1,6 +1,6 @@
 SHELL := /bin/bash
 
-.PHONY: setup setup-secrets sync-workspace setup-egress build-zeroclaw-adapter tasks easy easy-matrix deploy-daemon submit-daemon-task remove-daemon run run-matrix collect
+.PHONY: setup setup-secrets sync-workspace setup-egress build-zeroclaw-adapter tasks easy easy-matrix deploy-daemon submit-daemon-task remove-daemon run run-matrix collect score
 
 setup:
 	kubectl apply -f k8s/base/namespace.yaml
@@ -52,3 +52,6 @@ run-matrix:
 
 collect:
 	./scripts/collect-logs.sh
+
+score:
+	python3 ./scripts/score-results.py
