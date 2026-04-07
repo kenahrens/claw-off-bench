@@ -35,6 +35,6 @@
 - [x] Lock a canonical 5-task suite dedicated to cross-agent comparison (stable IDs, instructions, and repeat defaults).
 - [x] Add agent capability manifest (`config/agents-capabilities.csv`) for command contract, interactive behavior, and required flags per runtime.
 - [x] Add non-interactive safety policy per agent (approval bypass, max tool iterations, timeout policy) so runs do not hang.
-- [ ] Add preflight gate that fails early when required images/credentials are missing for the selected comparison mode.
+- [x] Add preflight gate that fails early when required images/credentials are missing for the selected comparison mode.
 - [x] Produce a single final comparison artifact (`results/factory-summary.json`) with per-agent pass/fail, success rate, median, p95, and failure reasons.
 - [ ] Add a `make doctor` diagnostic to print exactly what is blocking a full 5-agent benchmark before running.

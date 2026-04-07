@@ -79,8 +79,10 @@ Use these only when you need lower-level control:
 Matrix notes:
 
 - `scripts/run-matrix.sh` performs image preflight and writes `results/matrix-preflight.tsv`.
+- `scripts/preflight-gate.sh` enforces credentials/image readiness for the selected comparison mode before matrix execution.
 - Unavailable agents are skipped by default so available agents still run.
 - Set `MATRIX_STRICT=true` to fail when any configured agent is unavailable.
+- Set `COMPARISON_MODE=full5` to require all 5 configured agents before running.
 - Use `make matrix-preflight` to run only the availability check.
 - To compare all 5 agents, ensure every image in `config/agents.csv` is pullable from your environment.
 

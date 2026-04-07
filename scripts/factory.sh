@@ -24,6 +24,7 @@ allow_package_registries="${ALLOW_PACKAGE_REGISTRIES:-false}"
 clean_start="${FACTORY_CLEAN_START:-true}"
 use_existing_secrets="${FACTORY_USE_EXISTING_SECRETS:-true}"
 build_zeroclaw_adapter="${BUILD_ZEROCLAW_ADAPTER:-auto}"
+comparison_mode="${COMPARISON_MODE:-available}"
 
 if ! [[ "${matrix_strict}" =~ ^(true|false)$ ]]; then
   echo "error: MATRIX_STRICT must be true or false" >&2
@@ -57,6 +58,11 @@ fi
 
 if ! [[ "${build_zeroclaw_adapter}" =~ ^(auto|always|never)$ ]]; then
   echo "error: BUILD_ZEROCLAW_ADAPTER must be auto, always, or never" >&2
+  exit 1
+fi
+
+if ! [[ "${comparison_mode}" =~ ^(available|full5)$ ]]; then
+  echo "error: COMPARISON_MODE must be available or full5" >&2
   exit 1
 fi
 
@@ -111,8 +117,8 @@ if [[ "${build_zeroclaw_adapter}" != "never" && ( -z "${agent_filter}" || ",${ag
 fi
 
 effective_agents="${agent_filter:-all}"
-echo "[factory] preflight matrix (agents=${effective_agents})"
-AGENT_FILTER="${agent_filter}" MATRIX_STRICT="${matrix_strict}" make matrix-preflight
+echo "[factory] preflight gate (mode=${comparison_mode}, agents=${effective_agents})"
+COMPARISON_MODE="${comparison_mode}" AGENT_FILTER="${agent_filter}" MATRIX_STRICT="${matrix_strict}" ./scripts/preflight-gate.sh
 
 echo "[factory] run matrix (agents=${effective_agents}, repeats=${repeat_count})"
 REQUIRE_GITHUB_TOKEN="${require_github_token}" AGENT_FILTER="${agent_filter}" MATRIX_STRICT="${matrix_strict}" REPEAT_COUNT="${repeat_count}" make run-matrix
