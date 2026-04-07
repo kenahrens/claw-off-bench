@@ -1,6 +1,6 @@
 SHELL := /bin/bash
 
-.PHONY: setup setup-secrets sync-workspace setup-egress build-zeroclaw-adapter tasks easy easy-matrix matrix-preflight deploy-daemon submit-daemon-task remove-daemon run run-matrix collect score
+.PHONY: setup setup-secrets sync-workspace setup-egress build-zeroclaw-adapter tasks easy eval factory easy-matrix matrix-preflight deploy-daemon submit-daemon-task remove-daemon run run-matrix collect score
 
 setup:
 	kubectl apply -f k8s/base/namespace.yaml
@@ -40,6 +40,12 @@ daemon-task-%:
 
 easy:
 	./scripts/easy-button.sh
+
+eval:
+	./scripts/eval.sh
+
+factory:
+	./scripts/factory.sh
 
 easy-matrix:
 	./scripts/easy-matrix.sh

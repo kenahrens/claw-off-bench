@@ -19,6 +19,7 @@ The benchmark matrix is tracked in `config/agents.csv`.
 ## Repository Layout
 
 - `config/agents.csv`: runtime matrix and image/template mapping.
+- `config/eval.env`: checked-in run profile for one-command evaluation.
 - `tasks/tasks.yaml`: benchmark task suite.
 - `k8s/base`: namespace, PVC, secrets template, baseline deny policy.
 - `k8s/templates`: generic and ZeroClaw-compatible Job manifests.
@@ -48,6 +49,17 @@ The policy resolves current A records and restricts agent pods (`app=claw-runner
 - `dig` (for egress allowlist resolution)
 
 ## Quickstart
+
+Profile-driven single command (recommended):
+
+1. Review and adjust `config/eval.env` for your run profile.
+2. Export credentials once: `OPENROUTER_API_KEY=...` (or `LLM_API_KEY=...`).
+3. Run `make eval`.
+
+Factory end-to-end command:
+
+- `OPENROUTER_API_KEY=... make factory`
+- Runs setup -> preflight -> matrix run -> collect -> score using `config/eval.env` defaults and optional env overrides.
 
 Single command (job mode, task 1):
 
@@ -105,3 +117,18 @@ Notes:
 - Use `k8s/templates/job-zeroclaw.yaml` when the default template fails due to stricter runtime assumptions.
 - The ZeroClaw template keeps non-root and dropped caps but allows writable root filesystem when required.
 - Logs are written to `results/*.txt` for post-run scoring and analysis.
+
+## Strategy Reset (Next)
+
+The next iteration shifts from command-by-command execution to a factory workflow:
+
+- one config file for run inputs (`config/eval.env`), not per-command env churn
+- one command (`make factory`) that runs setup, preflight, full multi-agent task execution, collection, and scoring
+- one diagnostic command (`make doctor`) that explains blockers for full 5-agent comparison before execution
+- one final artifact (`results/factory-summary.json`) for direct agent comparison
+
+`make eval` now provides a profile-driven one-command entrypoint using `config/eval.env`.
+
+`make factory` now provides an end-to-end run path: setup, matrix preflight, matrix execution, log collection, and scoring.
+
+The remaining factory follow-up work is focused on canonical 5-task locking, stricter preflight diagnostics, and richer final comparison artifacts.

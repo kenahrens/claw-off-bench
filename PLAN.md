@@ -27,3 +27,14 @@
 - [x] Skip unavailable agents by default (with optional strict mode) so comparisons proceed with available agents.
 - [x] Expose one-command multi-agent run path that defaults to all configured agents.
 - [x] Keep zero-touch command for users while surfacing exactly what still blocks full 5-agent comparisons.
+
+## Automation-First Reset Plan
+
+- [x] Replace ad-hoc env-var driven runs with a single checked-in run profile file (`config/eval.env`) plus one command.
+- [x] Add `make factory` to execute end-to-end evaluation: setup -> preflight -> run all agents across 5 standard tasks -> collect -> score.
+- [ ] Lock a canonical 5-task suite dedicated to cross-agent comparison (stable IDs, instructions, and repeat defaults).
+- [ ] Add agent capability manifest (`config/agents-capabilities.csv`) for command contract, interactive behavior, and required flags per runtime.
+- [ ] Add non-interactive safety policy per agent (approval bypass, max tool iterations, timeout policy) so runs do not hang.
+- [ ] Add preflight gate that fails early when required images/credentials are missing for the selected comparison mode.
+- [ ] Produce a single final comparison artifact (`results/factory-summary.json`) with per-agent pass/fail, success rate, median, p95, and failure reasons.
+- [ ] Add a `make doctor` diagnostic to print exactly what is blocking a full 5-agent benchmark before running.
