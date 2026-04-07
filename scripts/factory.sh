@@ -26,6 +26,10 @@ use_existing_secrets="${FACTORY_USE_EXISTING_SECRETS:-true}"
 build_zeroclaw_adapter="${BUILD_ZEROCLAW_ADAPTER:-auto}"
 comparison_mode="${COMPARISON_MODE:-available}"
 
+if [[ "${comparison_mode}" == "full5" ]]; then
+  comparison_mode="full"
+fi
+
 if ! [[ "${matrix_strict}" =~ ^(true|false)$ ]]; then
   echo "error: MATRIX_STRICT must be true or false" >&2
   exit 1
@@ -61,8 +65,8 @@ if ! [[ "${build_zeroclaw_adapter}" =~ ^(auto|always|never)$ ]]; then
   exit 1
 fi
 
-if ! [[ "${comparison_mode}" =~ ^(available|full5)$ ]]; then
-  echo "error: COMPARISON_MODE must be available or full5" >&2
+if ! [[ "${comparison_mode}" =~ ^(available|full)$ ]]; then
+  echo "error: COMPARISON_MODE must be available or full" >&2
   exit 1
 fi
 

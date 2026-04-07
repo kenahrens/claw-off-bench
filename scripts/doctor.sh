@@ -14,13 +14,17 @@ if [[ -f "${profile_file}" ]]; then
   done < "${profile_file}"
 fi
 
-doctor_mode="${DOCTOR_MODE:-full5}"
+doctor_mode="${DOCTOR_MODE:-full}"
 agent_filter="${AGENT_FILTER:-}"
 require_github_token="${REQUIRE_GITHUB_TOKEN:-false}"
 report_file="results/matrix-preflight.tsv"
 
-if ! [[ "${doctor_mode}" =~ ^(full5|available)$ ]]; then
-  echo "error: DOCTOR_MODE must be full5 or available" >&2
+if [[ "${doctor_mode}" == "full5" ]]; then
+  doctor_mode="full"
+fi
+
+if ! [[ "${doctor_mode}" =~ ^(full|available)$ ]]; then
+  echo "error: DOCTOR_MODE must be full or available" >&2
   exit 1
 fi
 
@@ -46,12 +50,12 @@ else
   echo "[doctor] cluster secrets: ok"
 fi
 
-if [[ "${doctor_mode}" == "full5" && -n "${agent_filter}" ]]; then
-  blockers+=("DOCTOR_MODE=full5 requires AGENT_FILTER to be empty")
+if [[ "${doctor_mode}" == "full" && -n "${agent_filter}" ]]; then
+  blockers+=("DOCTOR_MODE=full requires AGENT_FILTER to be empty")
 fi
 
 preflight_filter="${agent_filter}"
-if [[ "${doctor_mode}" == "full5" ]]; then
+if [[ "${doctor_mode}" == "full" ]]; then
   preflight_filter=""
 fi
 
@@ -68,8 +72,10 @@ if [[ -f "${report_file}" ]]; then
 
   echo "[doctor] preflight selected=${selected_count} unavailable=${unavailable_count}"
 
-  if [[ "${doctor_mode}" == "full5" && "${selected_count}" -ne 5 ]]; then
-    blockers+=("full5 comparison requires 5 configured agents, found ${selected_count} in preflight report")
+  configured_count="$(awk -F',' 'NR > 1 { count++ } END { print count + 0 }' config/agents.csv)"
+
+  if [[ "${doctor_mode}" == "full" && "${selected_count}" -ne "${configured_count}" ]]; then
+    blockers+=("full comparison requires ${configured_count} configured agents, found ${selected_count} in preflight report")
   fi
 
   if [[ "${unavailable_count}" -gt 0 ]]; then

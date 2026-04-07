@@ -1,7 +1,7 @@
 # Implementation Plan
 
 - [x] Review existing Kubernetes scaffold and confirm gaps against the 2026 Claw evaluation goals.
-- [x] Add a canonical 5-agent evaluation matrix artifact for repeatable benchmark runs.
+- [x] Add a canonical evaluation matrix artifact for repeatable benchmark runs.
 - [x] Keep job templates aligned on fair limits (`1 CPU`, `512Mi`) and non-root execution.
 - [x] Add configurable command/bin support so each runtime can be invoked without template forks.
 - [x] Implement Kubernetes egress cage workflow that enforces allowlisted LLM/GitHub destinations.
@@ -26,7 +26,7 @@
 - [x] Generate an explicit availability report so unsupported/private images are visible up front.
 - [x] Skip unavailable agents by default (with optional strict mode) so comparisons proceed with available agents.
 - [x] Expose one-command multi-agent run path that defaults to all configured agents.
-- [x] Keep zero-touch command for users while surfacing exactly what still blocks full 5-agent comparisons.
+- [x] Keep zero-touch command for users while surfacing exactly what still blocks full-matrix comparisons.
 
 ## Automation-First Reset Plan
 
@@ -37,4 +37,4 @@
 - [x] Add non-interactive safety policy per agent (approval bypass, max tool iterations, timeout policy) so runs do not hang.
 - [x] Add preflight gate that fails early when required images/credentials are missing for the selected comparison mode.
 - [x] Produce a single final comparison artifact (`results/factory-summary.json`) with per-agent pass/fail, success rate, median, p95, and failure reasons.
-- [x] Add a `make doctor` diagnostic to print exactly what is blocking a full 5-agent benchmark before running.
+- [x] Add a `make doctor` diagnostic to print exactly what is blocking a full-matrix benchmark before running.

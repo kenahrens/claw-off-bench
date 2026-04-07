@@ -1,6 +1,5 @@
 agent,wait_timeout,max_tool_iterations,approval_mode,cpu_request,cpu_limit,memory_request,memory_limit,notes
 openclaw,20m,,default,1,1,1Gi,2Gi,OpenClaw needs higher memory headroom to avoid Node OOM.
-claw-code,20m,,default,1,1,512Mi,512Mi,Use benchmark-default resources.
 zeroclaw,12m,30,default,1,1,512Mi,512Mi,Limit tool iterations and enforce runtime timeout.
 nanoclaw,20m,,default,1,1,512Mi,512Mi,Use benchmark-default resources.
 picoclaw,20m,,default,1,1,512Mi,512Mi,Use benchmark-default resources.

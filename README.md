@@ -4,7 +4,7 @@ Kubernetes-first benchmark harness for the 2026 Claw runtime evaluation.
 
 ## Objective
 
-Run a standardized autonomous-coding benchmark across the five April 2026 Claw runtimes while measuring:
+Run a standardized autonomous-coding benchmark across the configured Claw runtimes while measuring:
 
 - Performance
 - Density
@@ -80,12 +80,12 @@ Matrix notes:
 
 - `scripts/run-matrix.sh` performs image preflight and writes `results/matrix-preflight.tsv`.
 - `scripts/preflight-gate.sh` enforces credentials/image readiness for the selected comparison mode before matrix execution.
-- `make doctor` prints blockers for a full 5-agent run before execution.
+- `make doctor` prints blockers for a full-matrix run before execution.
 - Unavailable agents are skipped by default so available agents still run.
 - Set `MATRIX_STRICT=true` to fail when any configured agent is unavailable.
-- Set `COMPARISON_MODE=full5` to require all 5 configured agents before running.
+- Set `COMPARISON_MODE=full` to require all configured agents before running.
 - Use `make matrix-preflight` to run only the availability check.
-- To compare all 5 agents, ensure every image in `config/agents.csv` is pullable from your environment.
+- To compare the full matrix, ensure every image in `config/agents.csv` is pullable from your environment.
 
 ## Daemon Mode (ZeroClaw)
 
@@ -114,11 +114,11 @@ The next iteration shifts from command-by-command execution to a factory workflo
 
 - one config file for run inputs (`config/eval.env`), not per-command env churn
 - one command (`make factory`) that runs setup, preflight, full multi-agent task execution, collection, and scoring
-- one diagnostic command (`make doctor`) that explains blockers for full 5-agent comparison before execution
+- one diagnostic command (`make doctor`) that explains blockers for full-matrix comparison before execution
 - one final artifact (`results/factory-summary.json`) for direct agent comparison
 
 `make eval` now provides a profile-driven one-command entrypoint using `config/eval.env`.
 
 `make factory` now provides an end-to-end run path: setup, matrix preflight, matrix execution, log collection, and scoring.
 
-The remaining factory follow-up work is focused on stricter preflight diagnostics (`make doctor`) and blocker clarity for full 5-agent comparisons.
+The remaining factory follow-up work is focused on ongoing benchmark operations and blocker clarity for full-matrix comparisons.
