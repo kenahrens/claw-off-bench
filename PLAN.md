@@ -37,4 +37,4 @@
 - [x] Add non-interactive safety policy per agent (approval bypass, max tool iterations, timeout policy) so runs do not hang.
 - [x] Add preflight gate that fails early when required images/credentials are missing for the selected comparison mode.
 - [x] Produce a single final comparison artifact (`results/factory-summary.json`) with per-agent pass/fail, success rate, median, p95, and failure reasons.
-- [ ] Add a `make doctor` diagnostic to print exactly what is blocking a full 5-agent benchmark before running.
+- [x] Add a `make doctor` diagnostic to print exactly what is blocking a full 5-agent benchmark before running.

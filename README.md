@@ -80,6 +80,7 @@ Matrix notes:
 
 - `scripts/run-matrix.sh` performs image preflight and writes `results/matrix-preflight.tsv`.
 - `scripts/preflight-gate.sh` enforces credentials/image readiness for the selected comparison mode before matrix execution.
+- `make doctor` prints blockers for a full 5-agent run before execution.
 - Unavailable agents are skipped by default so available agents still run.
 - Set `MATRIX_STRICT=true` to fail when any configured agent is unavailable.
 - Set `COMPARISON_MODE=full5` to require all 5 configured agents before running.
