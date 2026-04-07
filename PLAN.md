@@ -17,3 +17,4 @@
 - [x] Add standard task aliases (`TASK_1`, `TASK_2`, ...) for simpler benchmark execution.
 - [x] Add make targets for indexed job and daemon task runs without per-run instruction env vars.
 - [x] Add an easy-button workflow that performs setup + run with sensible defaults in one command.
+- [x] Add an easy matrix workflow that runs setup + matrix execution in one command.
