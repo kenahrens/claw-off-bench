@@ -21,19 +21,9 @@ repeat_count="${REPEAT_COUNT:-1}"
 agent_filter="${AGENT_FILTER:-}"
 require_github_token="${REQUIRE_GITHUB_TOKEN:-false}"
 allow_package_registries="${ALLOW_PACKAGE_REGISTRIES:-false}"
-
-if [[ -z "${LLM_API_KEY:-}" && -n "${OPENROUTER_API_KEY:-}" ]]; then
-  export LLM_API_KEY="${OPENROUTER_API_KEY}"
-fi
-
-if [[ -z "${LLM_API_KEY:-}" ]]; then
-  echo "error: set OPENROUTER_API_KEY (or LLM_API_KEY) before running make factory" >&2
-  exit 1
-fi
-
-if [[ -z "${GITHUB_TOKEN:-}" ]]; then
-  export GITHUB_TOKEN="chat-only-not-used"
-fi
+clean_start="${FACTORY_CLEAN_START:-true}"
+use_existing_secrets="${FACTORY_USE_EXISTING_SECRETS:-true}"
+build_zeroclaw_adapter="${BUILD_ZEROCLAW_ADAPTER:-auto}"
 
 if ! [[ "${matrix_strict}" =~ ^(true|false)$ ]]; then
   echo "error: MATRIX_STRICT must be true or false" >&2
@@ -55,11 +45,49 @@ if ! [[ "${allow_package_registries}" =~ ^(true|false)$ ]]; then
   exit 1
 fi
 
+if ! [[ "${clean_start}" =~ ^(true|false)$ ]]; then
+  echo "error: FACTORY_CLEAN_START must be true or false" >&2
+  exit 1
+fi
+
+if ! [[ "${use_existing_secrets}" =~ ^(true|false)$ ]]; then
+  echo "error: FACTORY_USE_EXISTING_SECRETS must be true or false" >&2
+  exit 1
+fi
+
+if ! [[ "${build_zeroclaw_adapter}" =~ ^(auto|always|never)$ ]]; then
+  echo "error: BUILD_ZEROCLAW_ADAPTER must be auto, always, or never" >&2
+  exit 1
+fi
+
+if [[ "${clean_start}" == "true" ]]; then
+  echo "[factory] clean stage"
+  make clean-bench
+fi
+
 echo "[factory] setup resources"
 make setup
 
-echo "[factory] apply secrets"
-REQUIRE_GITHUB_TOKEN="${require_github_token}" make setup-secrets
+if [[ "${use_existing_secrets}" == "true" ]]; then
+  echo "[factory] verify cluster secrets"
+  REQUIRE_GITHUB_TOKEN="${require_github_token}" ./scripts/check-cluster-secrets.sh
+else
+  if [[ -z "${LLM_API_KEY:-}" && -n "${OPENROUTER_API_KEY:-}" ]]; then
+    export LLM_API_KEY="${OPENROUTER_API_KEY}"
+  fi
+
+  if [[ -z "${LLM_API_KEY:-}" ]]; then
+    echo "error: set OPENROUTER_API_KEY (or LLM_API_KEY) when FACTORY_USE_EXISTING_SECRETS=false" >&2
+    exit 1
+  fi
+
+  if [[ -z "${GITHUB_TOKEN:-}" ]]; then
+    export GITHUB_TOKEN="chat-only-not-used"
+  fi
+
+  echo "[factory] apply secrets"
+  REQUIRE_GITHUB_TOKEN="${require_github_token}" make setup-secrets
+fi
 
 echo "[factory] sync workspace"
 make sync-workspace
@@ -67,9 +95,19 @@ make sync-workspace
 echo "[factory] apply egress policy"
 ALLOW_PACKAGE_REGISTRIES="${allow_package_registries}" make setup-egress
 
-if [[ -z "${agent_filter}" || ",${agent_filter}," == *",zeroclaw," ]]; then
-  echo "[factory] build zeroclaw adapter"
-  make build-zeroclaw-adapter
+if [[ "${build_zeroclaw_adapter}" != "never" && ( -z "${agent_filter}" || ",${agent_filter}," == *",zeroclaw," ) ]]; then
+  should_build="true"
+
+  if [[ "${build_zeroclaw_adapter}" == "auto" ]] && docker image inspect zeroclaw-adapter:latest >/dev/null 2>&1; then
+    should_build="false"
+  fi
+
+  if [[ "${should_build}" == "true" ]]; then
+    echo "[factory] build zeroclaw adapter"
+    make build-zeroclaw-adapter
+  else
+    echo "[factory] zeroclaw adapter present locally; skipping build"
+  fi
 fi
 
 effective_agents="${agent_filter:-all}"

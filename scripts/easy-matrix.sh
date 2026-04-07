@@ -3,8 +3,8 @@ set -euo pipefail
 
 agent_filter="${AGENT_FILTER:-}"
 repeat_count="${REPEAT_COUNT:-1}"
-default_provider="${DEFAULT_PROVIDER:-openrouter}"
-default_model="${DEFAULT_MODEL:-nvidia/nemotron-3-super-120b-a12b:free}"
+default_provider="${DEFAULT_PROVIDER:-openai}"
+default_model="${DEFAULT_MODEL:-gpt-5-mini}"
 
 if [[ -z "${LLM_API_KEY:-}" && -n "${OPENROUTER_API_KEY:-}" ]]; then
   export LLM_API_KEY="${OPENROUTER_API_KEY}"
