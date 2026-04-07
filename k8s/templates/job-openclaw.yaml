@@ -1,0 +1,90 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: ${JOB_NAME}
+  namespace: claw-bench
+  labels:
+    claw.agent: ${AGENT_NAME}
+    claw.task: ${TASK_ID}
+spec:
+  backoffLimit: 0
+  template:
+    metadata:
+      labels:
+        app: claw-runner
+        claw.agent: ${AGENT_NAME}
+        claw.task: ${TASK_ID}
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: agent
+          image: ${AGENT_IMAGE}
+          imagePullPolicy: IfNotPresent
+          workingDir: /workspace
+          command: ["sh", "-lc", "openclaw agent --local --agent main -m \"$$TASK_PROMPT\" --json"]
+          env:
+            - name: HOME
+              value: /home/node
+            - name: TASK_PROMPT
+              value: "${TASK_INSTRUCTION}"
+            - name: LLM_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: claw-secrets
+                  key: llm_api_key
+            - name: API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: claw-secrets
+                  key: llm_api_key
+            - name: OPENROUTER_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: claw-secrets
+                  key: llm_api_key
+            - name: OPENAI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: claw-secrets
+                  key: llm_api_key
+            - name: ANTHROPIC_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: claw-secrets
+                  key: llm_api_key
+            - name: GITHUB_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: claw-secrets
+                  key: github_token
+          resources:
+            requests:
+              cpu: "${RESOURCE_CPU_REQUEST}"
+              memory: "${RESOURCE_MEMORY_REQUEST}"
+            limits:
+              cpu: "${RESOURCE_CPU_LIMIT}"
+              memory: "${RESOURCE_MEMORY_LIMIT}"
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+            seccompProfile:
+              type: RuntimeDefault
+          volumeMounts:
+            - name: workspace
+              mountPath: /workspace
+            - name: tmp
+              mountPath: /tmp
+            - name: home
+              mountPath: /home/node
+      volumes:
+        - name: workspace
+          persistentVolumeClaim:
+            claimName: claw-workspace
+        - name: tmp
+          emptyDir: {}
+        - name: home
+          emptyDir: {}

@@ -1,5 +1,5 @@
 agent,stars,runtime,footprint,use_case,image,template,bin
-openclaw,335k,Node.js,~1.5GB,high-context legacy refactor,ghcr.io/openclaw/openclaw:latest,k8s/templates/job.yaml,claw-cli
+openclaw,335k,Node.js,~1.5GB,high-context legacy refactor,ghcr.io/openclaw/openclaw:latest,k8s/templates/job-openclaw.yaml,openclaw
 zeroclaw,26k,Rust,<5MB,high-density factory work,zeroclaw-adapter:latest,k8s/templates/job-zeroclaw.yaml,zero-claw
 nanoclaw,21k,TypeScript/Wasm,~50MB,secure untrusted modules,ghcr.io/claw/nanoclaw:latest,k8s/templates/job.yaml,claw-cli
 picoclaw,13k,Go,~10MB,fast edge execution,ghcr.io/claw/picoclaw:latest,k8s/templates/job.yaml,claw-cli

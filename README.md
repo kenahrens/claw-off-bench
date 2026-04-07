@@ -104,6 +104,7 @@ Notes:
 ## Notes
 
 - Use `k8s/templates/job-zeroclaw.yaml` when the default template fails due to stricter runtime assumptions.
+- OpenClaw uses `k8s/templates/job-openclaw.yaml` to align with its `openclaw agent --local` command contract.
 - The ZeroClaw template keeps non-root and dropped caps but allows writable root filesystem when required.
 - Logs are written to `results/*.txt` for post-run scoring and analysis.
 - Final comparison summary is written to `results/factory-summary.json`.
