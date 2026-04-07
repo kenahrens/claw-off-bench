@@ -50,45 +50,28 @@ The policy resolves current A records and restricts agent pods (`app=claw-runner
 
 ## Quickstart
 
-Profile-driven single command (recommended):
+Use only these commands:
 
-1. Review and adjust `config/eval.env` for your run profile.
-2. Export credentials once: `OPENROUTER_API_KEY=...` (or `LLM_API_KEY=...`).
-3. Run `make eval`.
+1. `make bench-init` - one-time bootstrap + verify cluster secrets.
+2. `make bench-smoke` - cheap single-task canary.
+3. `make bench-run` - full clean end-to-end comparison run.
+4. `make bench-report` - collect + score latest artifacts.
 
-Factory end-to-end command:
+Optional helper commands:
 
-- `OPENROUTER_API_KEY=... make factory`
-- Runs setup -> preflight -> matrix run -> collect -> score using `config/eval.env` defaults and optional env overrides.
+- `make bench-help` - print the simple command set.
+- `make bench-reset` - clean run state without running a benchmark.
 
-Single command (job mode, task 1):
+That is the intended user interface. Everything else is internal/advanced.
 
-`OPENROUTER_API_KEY=... make easy`
+## Advanced Commands
 
-Single command (matrix mode, default all configured agents, 1 repeat):
+Use these only when you need lower-level control:
 
-`OPENROUTER_API_KEY=... make easy-matrix`
-
-Optional overrides:
-
-- `TASK_REF=TASK_2 make easy`
-- `EASY_MODE=daemon TASK_REF=TASK_1 make easy`
-- `DEFAULT_MODEL=nvidia/nemotron-3-super-120b-a12b:free make easy`
-- `AGENT_FILTER=zeroclaw REPEAT_COUNT=3 make easy-matrix`
-- `MATRIX_STRICT=true make easy-matrix` (fail if any configured agent is unavailable)
-
-1. Set context with `kubectl config use-context minikube` and verify with `kubectl config current-context`.
-2. Apply base resources with `make setup`.
-3. Apply credentials with `make setup-secrets` after exporting `LLM_API_KEY` (or `OPENROUTER_API_KEY`) and `GITHUB_TOKEN`.
-4. Sync repository contents into the workspace PVC with `make sync-workspace`.
-5. Apply the egress cage with `make setup-egress` (set `ALLOW_PACKAGE_REGISTRIES=true` only when dependency downloads are required).
-6. Build the ZeroClaw adapter image into the Minikube image store with `make build-zeroclaw-adapter`.
-7. List standard benchmark aliases with `make tasks`.
-8. Run one benchmark job with `make run-task-1` (or `make run-task-2`, etc.) after setting `AGENT_NAME` and `AGENT_IMAGE`; set `WAIT_TIMEOUT` to cap wait duration per run.
-9. You can still run with explicit task fields using `make run` and `TASK_REF`, or `TASK_ID` + `TASK_INSTRUCTION`.
-10. Run the full matrix with repeats using `REPEAT_COUNT=3 make run-matrix` (set `AGENT_FILTER=zeroclaw` to run a subset).
-11. Collect all run logs with `make collect`.
-12. Score current artifacts with `make score` (writes `results/score.json`).
+- `make compare` / `make factory`: direct end-to-end orchestration entrypoints.
+- `make setup-stage`: run setup + preflight only.
+- `make bootstrap`: one-time cluster setup and local adapter build cache.
+- Legacy granular targets: `setup`, `setup-secrets`, `sync-workspace`, `setup-egress`, `build-zeroclaw-adapter`, `run-matrix`, `collect`, `score`.
 
 Matrix notes:
 

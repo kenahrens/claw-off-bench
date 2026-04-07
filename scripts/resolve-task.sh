@@ -5,6 +5,16 @@ task_ref="${TASK_REF:-}"
 task_id="${TASK_ID:-}"
 task_instruction="${TASK_INSTRUCTION:-}"
 
+if [[ -n "${task_id}" || -n "${task_instruction}" ]]; then
+  if [[ -z "${task_id}" || -z "${task_instruction}" ]]; then
+    echo "error: provide both TASK_ID and TASK_INSTRUCTION when using explicit task fields" >&2
+    exit 1
+  fi
+
+  printf '%s\t%s\n' "${task_id}" "${task_instruction}"
+  exit 0
+fi
+
 mapfile -t task_rows < <(
   awk '
     /^[[:space:]]*-[[:space:]]id:/ {

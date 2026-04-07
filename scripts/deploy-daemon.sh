@@ -6,8 +6,8 @@ daemon_name="${DAEMON_NAME:-zeroclaw-daemon}"
 daemon_port="${DAEMON_PORT:-8787}"
 local_port="${DAEMON_LOCAL_PORT:-18787}"
 agent_image="${AGENT_IMAGE:-zeroclaw-adapter:latest}"
-default_provider="${DEFAULT_PROVIDER:-openrouter}"
-default_model="${DEFAULT_MODEL:-nvidia/nemotron-3-super-120b-a12b:free}"
+default_provider="${DEFAULT_PROVIDER:-openai}"
+default_model="${DEFAULT_MODEL:-gpt-5-mini}"
 
 export DAEMON_NAME="${daemon_name}" DAEMON_PORT="${daemon_port}" AGENT_IMAGE="${agent_image}" DEFAULT_PROVIDER="${default_provider}" DEFAULT_MODEL="${default_model}"
 

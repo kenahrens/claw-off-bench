@@ -5,8 +5,8 @@ mode="${EASY_MODE:-job}"
 task_ref="${TASK_REF:-TASK_1}"
 agent_name="${AGENT_NAME:-zeroclaw}"
 agent_image="${AGENT_IMAGE:-zeroclaw-adapter:latest}"
-default_provider="${DEFAULT_PROVIDER:-openrouter}"
-default_model="${DEFAULT_MODEL:-nvidia/nemotron-3-super-120b-a12b:free}"
+default_provider="${DEFAULT_PROVIDER:-openai}"
+default_model="${DEFAULT_MODEL:-gpt-5-mini}"
 wait_timeout="${WAIT_TIMEOUT:-120s}"
 
 if [[ "${mode}" != "job" && "${mode}" != "daemon" ]]; then

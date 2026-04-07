@@ -17,8 +17,8 @@ fi
 AGENT_ACTION="${AGENT_ACTION:-run}"
 
 if [[ "${AGENT_NAME}" == "zeroclaw" ]]; then
-  DEFAULT_PROVIDER="${DEFAULT_PROVIDER:-openrouter}"
-  DEFAULT_MODEL="${DEFAULT_MODEL:-nvidia/nemotron-3-super-120b-a12b:free}"
+  DEFAULT_PROVIDER="${DEFAULT_PROVIDER:-openai}"
+  DEFAULT_MODEL="${DEFAULT_MODEL:-gpt-5-mini}"
 else
   DEFAULT_PROVIDER="${DEFAULT_PROVIDER:-}"
   DEFAULT_MODEL="${DEFAULT_MODEL:-}"
