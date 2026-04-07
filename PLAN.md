@@ -19,3 +19,11 @@
 - [x] Add an easy-button workflow that performs setup + run with sensible defaults in one command.
 - [x] Add an easy matrix workflow that runs setup + matrix execution in one command.
 - [x] Add benchmark scoring workflow for success rate, median, and p95 from `results/` artifacts.
+
+## Revised Multi-Agent Plan
+
+- [x] Add matrix preflight to verify each configured agent image is runnable before execution.
+- [x] Generate an explicit availability report so unsupported/private images are visible up front.
+- [x] Skip unavailable agents by default (with optional strict mode) so comparisons proceed with available agents.
+- [x] Expose one-command multi-agent run path that defaults to all configured agents.
+- [x] Keep zero-touch command for users while surfacing exactly what still blocks full 5-agent comparisons.

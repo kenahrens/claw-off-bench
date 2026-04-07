@@ -53,7 +53,7 @@ Single command (job mode, task 1):
 
 `OPENROUTER_API_KEY=... make easy`
 
-Single command (matrix mode, default `zeroclaw`, 1 repeat):
+Single command (matrix mode, default all configured agents, 1 repeat):
 
 `OPENROUTER_API_KEY=... make easy-matrix`
 
@@ -63,6 +63,7 @@ Optional overrides:
 - `EASY_MODE=daemon TASK_REF=TASK_1 make easy`
 - `DEFAULT_MODEL=nvidia/nemotron-3-super-120b-a12b:free make easy`
 - `AGENT_FILTER=zeroclaw REPEAT_COUNT=3 make easy-matrix`
+- `MATRIX_STRICT=true make easy-matrix` (fail if any configured agent is unavailable)
 
 1. Set context with `kubectl config use-context minikube` and verify with `kubectl config current-context`.
 2. Apply base resources with `make setup`.
@@ -76,6 +77,14 @@ Optional overrides:
 10. Run the full matrix with repeats using `REPEAT_COUNT=3 make run-matrix` (set `AGENT_FILTER=zeroclaw` to run a subset).
 11. Collect all run logs with `make collect`.
 12. Score current artifacts with `make score` (writes `results/score.json`).
+
+Matrix notes:
+
+- `scripts/run-matrix.sh` performs image preflight and writes `results/matrix-preflight.tsv`.
+- Unavailable agents are skipped by default so available agents still run.
+- Set `MATRIX_STRICT=true` to fail when any configured agent is unavailable.
+- Use `make matrix-preflight` to run only the availability check.
+- To compare all 5 agents, ensure every image in `config/agents.csv` is pullable from your environment.
 
 ## Daemon Mode (ZeroClaw)
 

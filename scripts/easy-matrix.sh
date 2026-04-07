@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-agent_filter="${AGENT_FILTER:-zeroclaw}"
+agent_filter="${AGENT_FILTER:-}"
 repeat_count="${REPEAT_COUNT:-1}"
 default_provider="${DEFAULT_PROVIDER:-openrouter}"
 default_model="${DEFAULT_MODEL:-nvidia/nemotron-3-super-120b-a12b:free}"
@@ -33,12 +33,13 @@ make sync-workspace
 echo "[easy-matrix] apply egress policy"
 make setup-egress
 
-if [[ ",${agent_filter}," == *",zeroclaw," ]]; then
+if [[ -z "${agent_filter}" || ",${agent_filter}," == *",zeroclaw," ]]; then
   echo "[easy-matrix] build zeroclaw adapter"
   make build-zeroclaw-adapter
 fi
 
-echo "[easy-matrix] run matrix (agents=${agent_filter}, repeats=${repeat_count})"
+effective_agents="${agent_filter:-all}"
+echo "[easy-matrix] run matrix (agents=${effective_agents}, repeats=${repeat_count})"
 REQUIRE_GITHUB_TOKEN=false AGENT_FILTER="${agent_filter}" REPEAT_COUNT="${repeat_count}" make run-matrix
 
 echo "[easy-matrix] collect logs"
