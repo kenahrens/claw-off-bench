@@ -21,12 +21,15 @@ spec:
           image: ${AGENT_IMAGE}
           imagePullPolicy: IfNotPresent
           workingDir: /workspace
-          command: ["sh", "-lc", "openclaw agent --local --agent main -m \"$$TASK_PROMPT\" --json"]
+          command:
+            - sh
+            - -lc
+            - >-
+              openclaw models set "${DEFAULT_PROVIDER}/${DEFAULT_MODEL}" >/dev/null 2>&1 || true;
+              openclaw agent --local --agent main -m "${TASK_INSTRUCTION}" --json
           env:
             - name: HOME
               value: /home/node
-            - name: TASK_PROMPT
-              value: "${TASK_INSTRUCTION}"
             - name: LLM_API_KEY
               valueFrom:
                 secretKeyRef:
