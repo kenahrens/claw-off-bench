@@ -11,6 +11,8 @@ repeat_count="${REPEAT_COUNT:-1}"
 agent_filter="${AGENT_FILTER:-}"
 matrix_strict="${MATRIX_STRICT:-false}"
 preflight_only="${PREFLIGHT_ONLY:-false}"
+matrix_default_provider="${DEFAULT_PROVIDER:-openai}"
+matrix_default_model="${DEFAULT_MODEL:-gpt-4o-mini}"
 
 if [[ ! -f "${matrix_file}" ]]; then
   echo "error: agent matrix file not found: ${matrix_file}" >&2
@@ -181,6 +183,9 @@ for row in "${available_rows[@]}"; do
         AGENT_IMAGE="${image}" \
         AGENT_TEMPLATE="${template}" \
         AGENT_BIN="${bin}" \
+        DEFAULT_PROVIDER="${matrix_default_provider}" \
+        DEFAULT_MODEL="${matrix_default_model}" \
+        VALIDATE_RESULT=true \
         WAIT_TIMEOUT="${agent_wait_timeout}" \
         MAX_TOOL_ITERATIONS="${agent_max_tool_iterations}" \
         APPROVAL_MODE="${agent_approval_mode}" \
