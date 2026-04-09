@@ -11,6 +11,7 @@ from pathlib import Path
 
 ROOT = Path(".")
 RESULTS_DIR = ROOT / "results"
+RAW_RESULTS_DIR = RESULTS_DIR / "raw"
 PROFILE_FILE = ROOT / "config" / "eval.env"
 PORTABILITY_FILE = RESULTS_DIR / "portability-sweep.json"
 FACTORY_FILE = RESULTS_DIR / "factory-summary.json"
@@ -235,6 +236,12 @@ def gather_log_excerpts(score_payload):
             path = Path(run.get("file", ""))
             if path.exists():
                 records.append({"success": run.get("success", False), "path": path})
+
+    if not records:
+        for path in sorted(RAW_RESULTS_DIR.glob("*.txt")):
+            text = path.read_text(encoding="utf-8", errors="replace")
+            failed = bool(re.search(r"\berror\b|\bfailed\b", text, flags=re.IGNORECASE))
+            records.append({"success": not failed, "path": path})
 
     if not records:
         for path in sorted(RESULTS_DIR.glob("*.txt")):

@@ -88,6 +88,8 @@ agent = os.environ["AGENT_NAME_LOOKUP"]
 task_id = os.environ["TASK_ID_LOOKUP"]
 matches = glob.glob(f"results/{agent}-{task_id}-*.txt")
 if not matches:
+    matches = glob.glob(f"results/raw/{agent}-{task_id}-*.txt")
+if not matches:
     print("")
 else:
     matches.sort(key=lambda p: os.path.getmtime(p), reverse=True)

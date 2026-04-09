@@ -12,6 +12,9 @@ namespace="${NAMESPACE:-claw-bench}"
 workspace_pvc="${WORKSPACE_PVC_NAME:-claw-workspace}"
 evaluator_image="${TRACK_B_EVAL_IMAGE:-python:3.12-alpine}"
 run_timeout="${TRACK_B_EVAL_TIMEOUT:-180s}"
+raw_results_dir="results/raw"
+
+mkdir -p "${raw_results_dir}"
 
 if [[ ! -f "${fixtures_file}" ]]; then
   echo "error: Track B fixtures file not found: ${fixtures_file}" >&2
@@ -79,7 +82,7 @@ kctl wait --for=condition=Ready --timeout=120s "pod/${eval_pod}" -n "${namespace
 run_check() {
   local check_name="$1"
   local check_cmd="$2"
-  local output_file="results/${job_name}-trackb-${check_name}.txt"
+  local output_file="${raw_results_dir}/${job_name}-trackb-${check_name}.txt"
   local started="$(python3 - <<'PY'
 import time
 print(time.time())
@@ -145,7 +148,7 @@ payload = {
     "checks": checks,
 }
 
-out_path = Path("results") / f"{job_name}-trackb-eval.json"
+out_path = Path("results/raw") / f"{job_name}-trackb-eval.json"
 out_path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
 print(f"wrote {out_path}")
 print(f"track-b gate: {'pass' if passed else 'fail'} ({score}/{max_score})")

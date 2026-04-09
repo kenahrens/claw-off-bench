@@ -10,6 +10,7 @@ require_github_token="${REQUIRE_GITHUB_TOKEN:-false}"
 validate_result="${VALIDATE_RESULT:-false}"
 cleanup_on_timeout="${CLEANUP_ON_TIMEOUT:-true}"
 track_b_eval="${TRACK_B_EVAL:-false}"
+raw_results_dir="results/raw"
 
 IFS=$'\t' read -r resolved_task_id resolved_task_instruction < <(
   TASK_REF="${TASK_REF:-}" TASK_ID="${TASK_ID:-}" TASK_INSTRUCTION="${TASK_INSTRUCTION:-}" ./scripts/resolve-task.sh
@@ -19,6 +20,7 @@ TASK_ID="${resolved_task_id}"
 TASK_INSTRUCTION="${resolved_task_instruction}"
 export TASK_ID TASK_INSTRUCTION
 echo "[run-task] kube context=${KUBE_CONTEXT:-minikube}"
+mkdir -p "${raw_results_dir}"
 
 llm_key_b64="$(kctl get secret claw-secrets -n claw-bench -o jsonpath='{.data.llm_api_key}' 2>/dev/null || true)"
 github_token_b64="$(kctl get secret claw-secrets -n claw-bench -o jsonpath='{.data.github_token}' 2>/dev/null || true)"
@@ -43,7 +45,8 @@ timed_out="false"
 if ! kctl wait --for=condition=complete --timeout="${wait_timeout}" "job/${job_name}" -n claw-bench; then
   timed_out="true"
 fi
-kctl logs "job/${job_name}" -n claw-bench --timestamps | tee "results/${job_name}.txt"
+log_path="${raw_results_dir}/${job_name}.txt"
+kctl logs "job/${job_name}" -n claw-bench --timestamps | tee "${log_path}"
 
 if [[ "${timed_out}" == "true" ]]; then
   echo "error: job ${job_name} timed out after ${wait_timeout}" >&2
@@ -61,7 +64,7 @@ if ! [[ "${track_b_eval}" =~ ^(true|false)$ ]]; then
 fi
 
 if [[ "${validate_result}" == "true" ]]; then
-  if ! RUN_LOG_PATH="results/${job_name}.txt" python3 - <<'PY'
+  if ! RUN_LOG_PATH="${log_path}" python3 - <<'PY'
 import os
 import re
 import sys
@@ -102,4 +105,4 @@ if [[ "${track_b_eval}" == "true" ]]; then
   fi
 fi
 
-echo "saved logs to results/${job_name}.txt"
+echo "saved logs to ${log_path}"

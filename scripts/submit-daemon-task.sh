@@ -39,9 +39,9 @@ response="$(curl -sS -X POST "http://127.0.0.1:${local_port}/webhook" \
   -H "Content-Type: application/json" \
   -d "${payload}")"
 
-mkdir -p results
+mkdir -p results/raw
 task_suffix="$(printf '%s' "${resolved_task_id}" | tr '[:upper:]' '[:lower:]')"
-out_file="results/${daemon_name}-${task_suffix}-daemon-$(date +%s).json"
+out_file="results/raw/${daemon_name}-${task_suffix}-daemon-$(date +%s).json"
 printf '%s\n' "${response}" > "${out_file}"
 
 echo "saved daemon response to ${out_file}"

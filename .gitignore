@@ -6,6 +6,7 @@ tmp/
 results/*.txt
 results/*.json
 results/*.tsv
+results/raw/
 results/findings-table.csv
 results/findings-table.md
 results/findings-log-excerpts.md

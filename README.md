@@ -128,7 +128,7 @@ Notes:
 - NanoClaw uses `k8s/templates/job-nanoclaw.yaml` to send the required stdin JSON payload to `/app/entrypoint.sh`.
 - PicoClaw uses `k8s/templates/job-picoclaw.yaml` to align with its `picoclaw agent -m` command contract.
 - The ZeroClaw template keeps non-root and dropped caps but allows writable root filesystem when required.
-- Logs are written to `results/*.txt` for post-run scoring and analysis.
+- Raw per-run logs and gate outputs are written to `results/raw/` for post-run scoring and analysis.
 - Final comparison summary is written to `results/factory-summary.json`.
 - Track B fixture mapping lives in `config/track-b-fixtures.csv` and deterministic fixture tasks live in `tasks/track-b-tasks.yaml`.
 

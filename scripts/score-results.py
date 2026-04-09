@@ -8,6 +8,7 @@ from pathlib import Path
 
 
 RESULTS_DIR = Path("results")
+RAW_RESULTS_DIR = RESULTS_DIR / "raw"
 OUT_FILE = RESULTS_DIR / "score.json"
 
 
@@ -81,17 +82,30 @@ def parse_daemon_result(path: Path):
 
 def main():
     RESULTS_DIR.mkdir(exist_ok=True)
+    RAW_RESULTS_DIR.mkdir(parents=True, exist_ok=True)
 
     rows = []
-    for path in RESULTS_DIR.glob("*.txt"):
+    for path in RAW_RESULTS_DIR.glob("*.txt"):
         parsed = parse_job_result(path)
         if parsed:
             rows.append(parsed)
 
-    for path in RESULTS_DIR.glob("*.json"):
+    if not rows:
+        for path in RESULTS_DIR.glob("*.txt"):
+            parsed = parse_job_result(path)
+            if parsed:
+                rows.append(parsed)
+
+    for path in RAW_RESULTS_DIR.glob("*.json"):
         parsed = parse_daemon_result(path)
         if parsed:
             rows.append(parsed)
+
+    if not rows:
+        for path in RESULTS_DIR.glob("*.json"):
+            parsed = parse_daemon_result(path)
+            if parsed:
+                rows.append(parsed)
 
     grouped = defaultdict(list)
     for row in rows:
@@ -121,7 +135,7 @@ def main():
     OUT_FILE.write_text(json.dumps(output, indent=2) + "\n", encoding="utf-8")
 
     if not summary:
-        print("no benchmark results found in results/")
+        print("no benchmark results found in results/raw/")
         return
 
     print("agent\tmode\truns\tsuccess_rate\tmedian_s\tp95_s")

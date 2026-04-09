@@ -24,7 +24,8 @@ kctl delete pods -n "${namespace}" -l app=claw-runner --ignore-not-found >/dev/n
 
 echo "[clean] remove old local result artifacts"
 if [[ "${clean_results}" == "true" ]]; then
-  rm -f results/*.txt results/*.json results/matrix-preflight.tsv
+  rm -f results/*.json results/*.tsv
+  rm -rf results/raw
 fi
 
 echo "cleaned benchmark run state"

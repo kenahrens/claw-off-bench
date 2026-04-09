@@ -57,4 +57,4 @@ make collect
 echo "[track-b] score objective gates"
 make score-track-b
 
-echo "[track-b] done (results/track-b-summary.json)"
+echo "[track-b] done (results/track-b-summary.json, raw logs under results/raw/)"

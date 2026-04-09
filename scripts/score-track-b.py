@@ -6,15 +6,21 @@ from pathlib import Path
 
 
 RESULTS_DIR = Path("results")
+RAW_RESULTS_DIR = RESULTS_DIR / "raw"
 OUT_FILE = RESULTS_DIR / "track-b-summary.json"
 
 
 def load_rows():
     rows = []
-    for path in sorted(RESULTS_DIR.glob("*-trackb-eval.json")):
+    for path in sorted(RAW_RESULTS_DIR.glob("*-trackb-eval.json")):
         payload = json.loads(path.read_text(encoding="utf-8"))
         payload["file"] = str(path)
         rows.append(payload)
+    if not rows:
+        for path in sorted(RESULTS_DIR.glob("*-trackb-eval.json")):
+            payload = json.loads(path.read_text(encoding="utf-8"))
+            payload["file"] = str(path)
+            rows.append(payload)
     return rows
 
 
@@ -63,6 +69,7 @@ def summarize(rows):
 
 def main():
     RESULTS_DIR.mkdir(exist_ok=True)
+    RAW_RESULTS_DIR.mkdir(parents=True, exist_ok=True)
     rows = load_rows()
     summary = summarize(rows)
 
