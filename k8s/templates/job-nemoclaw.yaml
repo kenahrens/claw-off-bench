@@ -25,8 +25,11 @@ spec:
             - sh
             - -lc
             - >-
+              mkdir -p /home/node/.openclaw/workspace;
+              cp -a /workspace/. /home/node/.openclaw/workspace/ >/dev/null 2>&1 || true;
               openclaw models set "${DEFAULT_PROVIDER}/${DEFAULT_MODEL}" >/dev/null 2>&1 || true;
-              openclaw agent --local --agent main -m "${TASK_INSTRUCTION}" --json
+              openclaw agent --local --agent main -m "${TASK_INSTRUCTION}" --json;
+              cp -a /home/node/.openclaw/workspace/. /workspace/ >/dev/null 2>&1 || true
           env:
             - name: HOME
               value: /home/node
