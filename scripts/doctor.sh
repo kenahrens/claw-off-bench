@@ -63,10 +63,10 @@ if [[ "${doctor_mode}" == "full" ]]; then
   preflight_filter=""
 fi
 
-if AGENT_FILTER="${preflight_filter}" MATRIX_STRICT=false PREFLIGHT_ONLY=true ./scripts/run-matrix.sh >/tmp/doctor-preflight.log 2>&1; then
-  echo "[doctor] matrix preflight: completed"
+if COMPARISON_MODE="${doctor_mode}" AGENT_FILTER="${preflight_filter}" MATRIX_STRICT=false ./scripts/preflight-gate.sh >/tmp/doctor-preflight.log 2>&1; then
+  echo "[doctor] preflight gate: passed"
 else
-  blockers+=("matrix preflight failed: $(tr '\n' ' ' < /tmp/doctor-preflight.log | sed -E 's/[[:space:]]+/ /g')")
+  blockers+=("preflight gate failed: $(tr '\n' ' ' < /tmp/doctor-preflight.log | sed -E 's/[[:space:]]+/ /g')")
 fi
 
 if [[ -f "${report_file}" ]]; then

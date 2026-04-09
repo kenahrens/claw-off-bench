@@ -97,7 +97,8 @@ Matrix notes:
 - Set `FAIL_FAST=false` only when you intentionally want to continue after failures.
 - Timed-out runs are cleaned up automatically by default (`CLEANUP_ON_TIMEOUT=true`).
 - Budget guardrails are enforced when set: `MAX_TOTAL_RUNS`, `MAX_FAILED_RUNS`, `MAX_WALL_CLOCK_MIN`, `MAX_ANTHROPIC_RUNS` (`0` disables a guardrail).
-- Enable deterministic Track B score gates with `TRACK_B_EVAL=true`; each run writes `results/<job>-trackb-eval.json`.
+- `preflight-gate` is strict by default: it verifies guardrails are set and runs per-agent smoke contract checks (`RUN_SMOKE_CONTRACTS=true`) before full matrix execution.
+- Enable deterministic Track B score gates with `TRACK_B_EVAL=true`; each run writes `results/raw/<job>-trackb-eval.json`.
 - Use `make matrix-preflight` to run only the availability check.
 - To compare the full matrix, ensure every image in `config/agents.csv` is pullable from your environment.
 - `nemoclaw` is configured as `nemoclaw:latest` and may require building a local image from `https://github.com/NVIDIA/NemoClaw`.
