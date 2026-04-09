@@ -38,3 +38,10 @@
 - [x] Add preflight gate that fails early when required images/credentials are missing for the selected comparison mode.
 - [x] Produce a single final comparison artifact (`results/factory-summary.json`) with per-agent pass/fail, success rate, median, p95, and failure reasons.
 - [x] Add a `make doctor` diagnostic to print exactly what is blocking a full-matrix benchmark before running.
+
+## Post-Reset Milestones
+
+- [x] M1: Add hard matrix budget controls (`MAX_TOTAL_RUNS`, `MAX_FAILED_RUNS`, `MAX_WALL_CLOCK_MIN`, optional `MAX_ANTHROPIC_RUNS`) and keep fail-fast/cleanup defaults on.
+- [x] M2: Add Track A portability sweep with standardized failure taxonomy output.
+- [ ] M3: Add Track B deterministic coding fixtures and objective score gates.
+- [ ] M4: Publish one canonical run snapshot and findings package.

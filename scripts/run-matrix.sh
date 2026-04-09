@@ -17,6 +17,14 @@ task_filter="${TASK_FILTER:-T001,T002}"
 fail_fast="${FAIL_FAST:-true}"
 cleanup_on_timeout="${CLEANUP_ON_TIMEOUT:-true}"
 auto_clean_runners="${AUTO_CLEAN_RUNNERS:-true}"
+max_total_runs="${MAX_TOTAL_RUNS:-0}"
+max_failed_runs="${MAX_FAILED_RUNS:-0}"
+max_wall_clock_min="${MAX_WALL_CLOCK_MIN:-0}"
+max_anthropic_runs="${MAX_ANTHROPIC_RUNS:-0}"
+
+is_non_negative_integer() {
+  [[ "$1" =~ ^[0-9]+$ ]]
+}
 
 if [[ ! -f "${matrix_file}" ]]; then
   echo "error: agent matrix file not found: ${matrix_file}" >&2
@@ -55,6 +63,26 @@ fi
 
 if ! [[ "${auto_clean_runners}" =~ ^(true|false)$ ]]; then
   echo "error: AUTO_CLEAN_RUNNERS must be true or false" >&2
+  exit 1
+fi
+
+if ! is_non_negative_integer "${max_total_runs}"; then
+  echo "error: MAX_TOTAL_RUNS must be a non-negative integer" >&2
+  exit 1
+fi
+
+if ! is_non_negative_integer "${max_failed_runs}"; then
+  echo "error: MAX_FAILED_RUNS must be a non-negative integer" >&2
+  exit 1
+fi
+
+if ! is_non_negative_integer "${max_wall_clock_min}"; then
+  echo "error: MAX_WALL_CLOCK_MIN must be a non-negative integer" >&2
+  exit 1
+fi
+
+if ! is_non_negative_integer "${max_anthropic_runs}"; then
+  echo "error: MAX_ANTHROPIC_RUNS must be a non-negative integer" >&2
   exit 1
 fi
 
@@ -102,7 +130,7 @@ if [[ "${#task_rows[@]}" -eq 0 ]]; then
   exit 1
 fi
 
-echo "matrix defaults: provider=${matrix_default_provider} model=${matrix_default_model} tasks=${task_filter} fail_fast=${fail_fast}"
+echo "matrix defaults: provider=${matrix_default_provider} model=${matrix_default_model} tasks=${task_filter} fail_fast=${fail_fast} budgets(total=${max_total_runs} failed=${max_failed_runs} wall_min=${max_wall_clock_min} anthropic=${max_anthropic_runs})"
 
 mkdir -p results
 preflight_report="results/matrix-preflight.tsv"
@@ -171,6 +199,8 @@ fi
 
 failures=0
 runs=0
+anthropic_runs=0
+SECONDS=0
 
 for row in "${available_rows[@]}"; do
   IFS=',' read -r agent image template bin <<< "${row}"
@@ -216,8 +246,36 @@ for row in "${available_rows[@]}"; do
     task_instruction="${task_row#*$'\t'}"
 
     for run_index in $(seq 1 "${repeat_count}"); do
+      if [[ "${max_total_runs}" -gt 0 && "${runs}" -ge "${max_total_runs}" ]]; then
+        echo "error: stopping early because MAX_TOTAL_RUNS=${max_total_runs} was reached" >&2
+        echo "completed ${runs} runs with ${failures} failures" >&2
+        exit 1
+      fi
+
+      if [[ "${max_failed_runs}" -gt 0 && "${failures}" -ge "${max_failed_runs}" ]]; then
+        echo "error: stopping early because MAX_FAILED_RUNS=${max_failed_runs} was reached" >&2
+        echo "completed ${runs} runs with ${failures} failures" >&2
+        exit 1
+      fi
+
+      if [[ "${max_wall_clock_min}" -gt 0 && "${SECONDS}" -ge $((max_wall_clock_min * 60)) ]]; then
+        echo "error: stopping early because MAX_WALL_CLOCK_MIN=${max_wall_clock_min} was reached" >&2
+        echo "completed ${runs} runs with ${failures} failures in $((SECONDS / 60))m$((SECONDS % 60))s" >&2
+        exit 1
+      fi
+
+      if [[ "${matrix_default_provider}" == "anthropic" && "${max_anthropic_runs}" -gt 0 && "${anthropic_runs}" -ge "${max_anthropic_runs}" ]]; then
+        echo "error: stopping early because MAX_ANTHROPIC_RUNS=${max_anthropic_runs} was reached" >&2
+        echo "completed ${runs} runs with ${failures} failures" >&2
+        exit 1
+      fi
+
       runs=$((runs + 1))
       run_task_id="${task_id}r${run_index}"
+
+      if [[ "${matrix_default_provider}" == "anthropic" ]]; then
+        anthropic_runs=$((anthropic_runs + 1))
+      fi
 
       echo "[run ${runs}] ${agent} ${run_task_id}"
 
@@ -241,6 +299,13 @@ for row in "${available_rows[@]}"; do
         ./scripts/run-task.sh; then
         failures=$((failures + 1))
         echo "failed: ${agent} ${run_task_id}" >&2
+
+        if [[ "${max_failed_runs}" -gt 0 && "${failures}" -ge "${max_failed_runs}" ]]; then
+          echo "error: stopping early because MAX_FAILED_RUNS=${max_failed_runs} was reached" >&2
+          echo "completed ${runs} runs with ${failures} failures" >&2
+          exit 1
+        fi
+
         if [[ "${fail_fast}" == "true" ]]; then
           echo "error: stopping early because FAIL_FAST=true" >&2
           echo "completed with ${failures} failed runs" >&2
