@@ -5,4 +5,9 @@
 tmp/
 results/*.txt
 results/*.json
+results/*.tsv
+results/findings-table.csv
+results/findings-table.md
+results/findings-log-excerpts.md
+results/findings-blog-draft.md
 !results/.gitkeep
