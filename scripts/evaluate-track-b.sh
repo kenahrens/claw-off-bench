@@ -120,13 +120,15 @@ PY
 public_result="$(run_check public "timeout ${run_timeout} ${public_check}")"
 hidden_result="$(run_check hidden "timeout ${run_timeout} ${hidden_check}")"
 quality_result="$(run_check quality "timeout ${run_timeout} ${quality_check}")"
+run_log_path="${raw_results_dir}/${job_name}.txt"
 
-python3 - "${job_name}" "${base_task_id}" "${fixture_dir}" "${public_result}" "${hidden_result}" "${quality_result}" <<'PY'
+python3 - "${job_name}" "${base_task_id}" "${fixture_dir}" "${run_log_path}" "${public_result}" "${hidden_result}" "${quality_result}" <<'PY'
 import json
+import re
 import sys
 from pathlib import Path
 
-job_name, task_id, fixture_dir, public_raw, hidden_raw, quality_raw = sys.argv[1:]
+job_name, task_id, fixture_dir, run_log_path, public_raw, hidden_raw, quality_raw = sys.argv[1:]
 public = json.loads(public_raw)
 hidden = json.loads(hidden_raw)
 quality = json.loads(quality_raw)
@@ -135,6 +137,54 @@ checks = [public, hidden, quality]
 score = sum(1 for c in checks if c["passed"])
 max_score = len(checks)
 passed = score == max_score
+failed_checks = [c["name"] for c in checks if not c["passed"]]
+
+log_text = ""
+run_log = Path(run_log_path)
+if run_log.exists():
+    log_text = run_log.read_text(encoding="utf-8", errors="replace")
+
+check_text = ""
+for check in checks:
+    check_path = Path(check["output_file"])
+    if check_path.exists():
+        check_text += "\n" + check_path.read_text(encoding="utf-8", errors="replace")
+
+combined = f"{log_text}\n{check_text}"
+contract_marker_present = "track_b_done" in combined.lower()
+if not contract_marker_present:
+    passed = False
+    if "contract" not in failed_checks:
+        failed_checks.append("contract")
+
+
+def classify_failure():
+    text = combined.lower()
+    if passed:
+        return "", ""
+
+    if not contract_marker_present:
+        return "contract mismatch", "missing TRACK_B_DONE completion marker"
+
+    if re.search(r"authentication_error|invalid api key|incorrect api key|missing or placeholder", text):
+        return "auth/config", "credential/auth failure marker in logs"
+
+    if re.search(r"unsupported value|unsupported parameter|unsupported model|temperature", text):
+        return "model-parameter incompatibility", "provider/model parameter mismatch"
+
+    if any(c["exit_code"] == 124 for c in checks) or re.search(r"timed out|deadline exceeded|out of memory|resource exhaustion|oom", text):
+        return "timeout/resource exhaustion", "evaluation timeout or resource exhaustion"
+
+    if re.search(
+        r"permission denied|eisdir|media store not configured|elevated is not available|missing required property|no such file or directory|failed to create temp file|failed to create directory|unable to modify",
+        text,
+    ):
+        return "contract mismatch", "agent runtime/file tool contract mismatch"
+
+    return "output-quality/validation failure", "public/hidden/quality gates did not fully pass"
+
+
+failure_category, failure_detail = classify_failure()
 
 payload = {
     "job_name": job_name,
@@ -145,6 +195,10 @@ payload = {
         "score": score,
         "max_score": max_score,
     },
+    "failure_category": failure_category,
+    "failure_detail": failure_detail,
+    "contract_marker_present": contract_marker_present,
+    "failed_checks": failed_checks,
     "checks": checks,
 }
 

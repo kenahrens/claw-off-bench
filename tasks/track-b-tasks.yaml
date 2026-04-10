@@ -7,14 +7,14 @@ tasks:
     category: bugfix
     difficulty: medium
     repeat_default: 1
-    instruction: In tasks/fixtures/b001_stats_bugfix, fix src/stats.py so all tests in tests/ and hidden_tests/ pass without changing test files.
+    instruction: In tasks/fixtures/b001_stats_bugfix, fix src/stats.py so tests in tests/ and hidden_tests/ pass without changing tests. Work only in this fixture directory, do not ask for extra input, run python3 -m unittest discover -s tests -q and python3 -m unittest discover -s hidden_tests -q before finishing, then reply with exactly TRACK_B_DONE.
   - id: B002
     category: refactor
     difficulty: medium
     repeat_default: 1
-    instruction: In tasks/fixtures/b002_refactor_parser, refactor duplicated parsing logic in src/parser.py into a shared helper while preserving behavior; all tests in tests/ and hidden_tests/ must pass.
+    instruction: In tasks/fixtures/b002_refactor_parser, refactor duplicated parsing logic in src/parser.py into a shared helper while preserving behavior. Work only in this fixture directory, do not ask for extra input, run python3 -m unittest discover -s tests -q and python3 -m unittest discover -s hidden_tests -q before finishing, then reply with exactly TRACK_B_DONE.
   - id: B003
     category: security
     difficulty: hard
     repeat_default: 1
-    instruction: In tasks/fixtures/b003_security_validation, patch input validation in src/validation.py so tests in tests/ and hidden_tests/ pass without reducing strictness.
+    instruction: In tasks/fixtures/b003_security_validation, patch input validation in src/validation.py so tests in tests/ and hidden_tests/ pass without reducing strictness. Work only in this fixture directory, do not ask for extra input, run python3 -m unittest discover -s tests -q and python3 -m unittest discover -s hidden_tests -q before finishing, then reply with exactly TRACK_B_DONE.

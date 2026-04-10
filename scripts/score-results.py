@@ -10,6 +10,20 @@ from pathlib import Path
 RESULTS_DIR = Path("results")
 RAW_RESULTS_DIR = RESULTS_DIR / "raw"
 OUT_FILE = RESULTS_DIR / "score.json"
+RUN_SCOPE_FILE = RESULTS_DIR / "current-run-jobs.txt"
+
+
+def load_scoped_jobs():
+    if not RUN_SCOPE_FILE.exists():
+        return set()
+    jobs = {
+        line.strip()
+        for line in RUN_SCOPE_FILE.read_text(
+            encoding="utf-8", errors="replace"
+        ).splitlines()
+        if line.strip()
+    }
+    return jobs
 
 
 def parse_ts(value: str):
@@ -84,25 +98,38 @@ def main():
     RESULTS_DIR.mkdir(exist_ok=True)
     RAW_RESULTS_DIR.mkdir(parents=True, exist_ok=True)
 
+    scoped_jobs = load_scoped_jobs()
     rows = []
     for path in RAW_RESULTS_DIR.glob("*.txt"):
+        if scoped_jobs and path.stem not in scoped_jobs:
+            continue
         parsed = parse_job_result(path)
         if parsed:
             rows.append(parsed)
 
     if not rows:
         for path in RESULTS_DIR.glob("*.txt"):
+            if scoped_jobs and path.stem not in scoped_jobs:
+                continue
             parsed = parse_job_result(path)
             if parsed:
                 rows.append(parsed)
 
     for path in RAW_RESULTS_DIR.glob("*.json"):
+        if scoped_jobs and not any(
+            path.stem.startswith(f"{job}-") for job in scoped_jobs
+        ):
+            continue
         parsed = parse_daemon_result(path)
         if parsed:
             rows.append(parsed)
 
     if not rows:
         for path in RESULTS_DIR.glob("*.json"):
+            if scoped_jobs and not any(
+                path.stem.startswith(f"{job}-") for job in scoped_jobs
+            ):
+                continue
             parsed = parse_daemon_result(path)
             if parsed:
                 rows.append(parsed)

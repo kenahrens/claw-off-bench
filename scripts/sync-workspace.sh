@@ -47,6 +47,6 @@ tar \
   --exclude='results' \
   --exclude='.env' \
   --exclude='.env.*' \
-  -cf - . | kctl exec -i "${pod_name}" -n "${namespace}" -- /bin/sh -lc "rm -rf /workspace/* /workspace/.[!.]* /workspace/..?* 2>/dev/null || true; tar -xf - -C /workspace"
+  -cf - . | kctl exec -i "${pod_name}" -n "${namespace}" -- /bin/sh -lc "rm -rf /workspace/* /workspace/.[!.]* /workspace/..?* 2>/dev/null || true; tar -xf - -C /workspace; chown -R 1000:1000 /workspace; chmod -R u+rwX,g+rwX /workspace"
 
 echo "synced repository contents to pvc ${pvc_name} in namespace ${namespace}"

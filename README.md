@@ -100,6 +100,7 @@ Matrix notes:
 - Budget guardrails are enforced when set: `MAX_TOTAL_RUNS`, `MAX_FAILED_RUNS`, `MAX_WALL_CLOCK_MIN`, `MAX_ANTHROPIC_RUNS` (`0` disables a guardrail).
 - `preflight-gate` is strict by default: it verifies guardrails are set and runs per-agent smoke contract checks (`RUN_SMOKE_CONTRACTS=true`) before full matrix execution.
 - Enable deterministic Track B score gates with `TRACK_B_EVAL=true`; each run writes `results/raw/<job>-trackb-eval.json`.
+- Track B completion requires the marker `TRACK_B_DONE`; missing marker is classified as `contract mismatch`.
 - Use `make matrix-preflight` to run only the availability check.
 - To compare the full matrix, ensure every image in `config/agents.csv` is pullable from your environment.
 - `nemoclaw` is configured as `nemoclaw:latest` and may require building a local image from `https://github.com/NVIDIA/NemoClaw`.
@@ -131,6 +132,7 @@ Notes:
 - PicoClaw uses `k8s/templates/job-picoclaw.yaml` to align with its `picoclaw agent -m` command contract.
 - The ZeroClaw template keeps non-root and dropped caps but allows writable root filesystem when required.
 - Raw per-run logs and gate outputs are written to `results/raw/` for post-run scoring and analysis.
+- Scoring is scoped to the active run set using `results/current-run-jobs.txt`.
 - Final comparison summary is written to `results/factory-summary.json`.
 - Track B fixture mapping lives in `config/track-b-fixtures.csv` and deterministic fixture tasks live in `tasks/track-b-tasks.yaml`.
 

@@ -8,16 +8,35 @@ from pathlib import Path
 RESULTS_DIR = Path("results")
 RAW_RESULTS_DIR = RESULTS_DIR / "raw"
 OUT_FILE = RESULTS_DIR / "track-b-summary.json"
+RUN_SCOPE_FILE = RESULTS_DIR / "current-run-jobs.txt"
 
 
-def load_rows():
+def load_scoped_jobs():
+    if not RUN_SCOPE_FILE.exists():
+        return set()
+    return {
+        line.strip()
+        for line in RUN_SCOPE_FILE.read_text(
+            encoding="utf-8", errors="replace"
+        ).splitlines()
+        if line.strip()
+    }
+
+
+def load_rows(scoped_jobs):
     rows = []
     for path in sorted(RAW_RESULTS_DIR.glob("*-trackb-eval.json")):
+        stem = path.name[: -len("-trackb-eval.json")]
+        if scoped_jobs and stem not in scoped_jobs:
+            continue
         payload = json.loads(path.read_text(encoding="utf-8"))
         payload["file"] = str(path)
         rows.append(payload)
     if not rows:
         for path in sorted(RESULTS_DIR.glob("*-trackb-eval.json")):
+            stem = path.name[: -len("-trackb-eval.json")]
+            if scoped_jobs and stem not in scoped_jobs:
+                continue
             payload = json.loads(path.read_text(encoding="utf-8"))
             payload["file"] = str(path)
             rows.append(payload)
@@ -70,7 +89,7 @@ def summarize(rows):
 def main():
     RESULTS_DIR.mkdir(exist_ok=True)
     RAW_RESULTS_DIR.mkdir(parents=True, exist_ok=True)
-    rows = load_rows()
+    rows = load_rows(load_scoped_jobs())
     summary = summarize(rows)
 
     payload = {

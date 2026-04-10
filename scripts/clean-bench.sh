@@ -25,6 +25,7 @@ kctl delete pods -n "${namespace}" -l app=claw-runner --ignore-not-found >/dev/n
 echo "[clean] remove old local result artifacts"
 if [[ "${clean_results}" == "true" ]]; then
   rm -f results/*.json results/*.tsv
+  rm -f results/current-run-jobs.txt
   rm -rf results/raw
 fi
 

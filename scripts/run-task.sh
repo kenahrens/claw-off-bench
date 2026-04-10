@@ -11,6 +11,7 @@ validate_result="${VALIDATE_RESULT:-false}"
 cleanup_on_timeout="${CLEANUP_ON_TIMEOUT:-true}"
 track_b_eval="${TRACK_B_EVAL:-false}"
 raw_results_dir="results/raw"
+run_scope_file="${RUN_SCOPE_FILE:-results/current-run-jobs.txt}"
 
 IFS=$'\t' read -r resolved_task_id resolved_task_instruction < <(
   TASK_REF="${TASK_REF:-}" TASK_ID="${TASK_ID:-}" TASK_INSTRUCTION="${TASK_INSTRUCTION:-}" ./scripts/resolve-task.sh
@@ -21,6 +22,7 @@ TASK_INSTRUCTION="${resolved_task_instruction}"
 export TASK_ID TASK_INSTRUCTION
 echo "[run-task] kube context=${KUBE_CONTEXT:-minikube}"
 mkdir -p "${raw_results_dir}"
+mkdir -p "$(dirname "${run_scope_file}")"
 
 llm_key_b64="$(kctl get secret claw-secrets -n claw-bench -o jsonpath='{.data.llm_api_key}' 2>/dev/null || true)"
 github_token_b64="$(kctl get secret claw-secrets -n claw-bench -o jsonpath='{.data.github_token}' 2>/dev/null || true)"
@@ -39,6 +41,7 @@ fi
 
 manifest="$(./scripts/render-job.sh)"
 job_name="$(printf '%s\n' "${manifest}" | awk '/^  name:/ {print $2; exit}')"
+printf '%s\n' "${job_name}" >> "${run_scope_file}"
 
 printf '%s\n' "${manifest}" | kctl apply -f -
 timed_out="false"
