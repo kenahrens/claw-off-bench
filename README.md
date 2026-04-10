@@ -63,7 +63,8 @@ Use only these commands:
 7. `make smoke-one AGENT_NAME=<agent> SMOKE_PROVIDER=<provider>` - single-agent single-provider hello check.
 8. `make portability-sweep` - Track A compatibility sweep with taxonomy output (`results/portability-sweep.tsv`, `results/portability-sweep.json`).
 9. `make track-b-baseline` - Track B deterministic fixture baseline with objective gates (`results/track-b-summary.json`).
-10. `make findings-package` - M4 publication package (`results/canonical-run-snapshot.json`, `results/findings-table.csv`, `results/findings-log-excerpts.md`, `results/findings-blog-draft.md`).
+10. `make consistency-check` - repeatability gate that runs full scenario multiple times and compares normalized signatures (`results/consistency/run*/signature.json`).
+11. `make findings-package` - M4 publication package (`results/canonical-run-snapshot.json`, `results/findings-table.csv`, `results/findings-log-excerpts.md`, `results/findings-blog-draft.md`).
 
 Optional helper commands:
 

@@ -3,7 +3,7 @@ KUBE_CONTEXT ?= minikube
 KUBECTL := kubectl --context $(KUBE_CONTEXT)
 export KUBE_CONTEXT
 
-.PHONY: setup setup-secrets check-secrets sync-workspace setup-egress build-zeroclaw-adapter bootstrap clean-bench setup-stage compare validate bench-help bench-init bench-smoke bench-run bench-reset bench-report smoke-each smoke-one portability-sweep track-b-baseline findings-package factory-summary preflight-gate doctor tasks easy eval factory easy-matrix matrix-preflight deploy-daemon submit-daemon-task remove-daemon run run-matrix collect score score-track-b
+.PHONY: setup setup-secrets check-secrets sync-workspace setup-egress build-zeroclaw-adapter bootstrap clean-bench setup-stage compare validate bench-help bench-init bench-smoke bench-run bench-reset bench-report smoke-each smoke-one portability-sweep track-b-baseline consistency-check findings-package factory-summary preflight-gate doctor tasks easy eval factory easy-matrix matrix-preflight deploy-daemon submit-daemon-task remove-daemon run run-matrix collect score score-track-b
 
 setup:
 	$(KUBECTL) apply -f k8s/base/namespace.yaml
@@ -55,6 +55,7 @@ bench-help:
 	@echo "  make smoke-each   # per-agent hello-world readiness checks"
 	@echo "  make portability-sweep # Track A provider compatibility sweep"
 	@echo "  make track-b-baseline # Track B deterministic fixture baseline"
+	@echo "  make consistency-check # repeatability gate across full runs"
 	@echo "  make findings-package # M4 snapshot + findings artifacts"
 	@echo "  make bench-run    # full clean end-to-end comparison"
 	@echo "  make bench-report # collect + score latest artifacts"
@@ -88,6 +89,9 @@ portability-sweep:
 
 track-b-baseline:
 	./scripts/track-b-baseline.sh
+
+consistency-check:
+	./scripts/consistency-check.sh
 
 findings-package:
 	python3 ./scripts/build-findings-package.py
