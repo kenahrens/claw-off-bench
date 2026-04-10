@@ -18,6 +18,7 @@ tasks_file="${TASKS_FILE:-tasks/tasks.yaml}"
 fail_fast="${FAIL_FAST:-true}"
 cleanup_on_timeout="${CLEANUP_ON_TIMEOUT:-true}"
 auto_clean_runners="${AUTO_CLEAN_RUNNERS:-true}"
+track_b_reset_workspace="${TRACK_B_RESET_WORKSPACE:-false}"
 max_total_runs="${MAX_TOTAL_RUNS:-0}"
 max_failed_runs="${MAX_FAILED_RUNS:-0}"
 max_wall_clock_min="${MAX_WALL_CLOCK_MIN:-0}"
@@ -69,6 +70,11 @@ fi
 
 if ! [[ "${auto_clean_runners}" =~ ^(true|false)$ ]]; then
   echo "error: AUTO_CLEAN_RUNNERS must be true or false" >&2
+  exit 1
+fi
+
+if ! [[ "${track_b_reset_workspace}" =~ ^(true|false)$ ]]; then
+  echo "error: TRACK_B_RESET_WORKSPACE must be true or false" >&2
   exit 1
 fi
 
@@ -284,6 +290,10 @@ for row in "${available_rows[@]}"; do
       fi
 
       echo "[run ${runs}] ${agent} ${run_task_id}"
+
+      if [[ "${track_b_reset_workspace}" == "true" ]]; then
+        ./scripts/sync-workspace.sh
+      fi
 
       if ! AGENT_NAME="${agent}" \
         AGENT_IMAGE="${image}" \

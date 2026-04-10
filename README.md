@@ -101,6 +101,8 @@ Matrix notes:
 - `preflight-gate` is strict by default: it verifies guardrails are set and runs per-agent smoke contract checks (`RUN_SMOKE_CONTRACTS=true`) before full matrix execution.
 - Enable deterministic Track B score gates with `TRACK_B_EVAL=true`; each run writes `results/raw/<job>-trackb-eval.json`.
 - Track B completion requires the marker `TRACK_B_DONE`; missing marker is classified as `contract mismatch`.
+- Track B enforces edit policy: only `src/` may change; edits to `tests/` or `hidden_tests/` are classified as `contract mismatch`.
+- Set `TRACK_B_RESET_WORKSPACE=true` to re-sync the workspace before every run (enabled by default in `make track-b-baseline`).
 - Use `make matrix-preflight` to run only the availability check.
 - To compare the full matrix, ensure every image in `config/agents.csv` is pullable from your environment.
 - `nemoclaw` is configured as `nemoclaw:latest` and may require building a local image from `https://github.com/NVIDIA/NemoClaw`.

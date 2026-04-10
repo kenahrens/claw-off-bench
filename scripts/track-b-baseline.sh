@@ -48,6 +48,7 @@ REPEAT_COUNT="${repeat_count}" \
 AGENT_FILTER="${agent_filter}" \
 MATRIX_STRICT="${matrix_strict}" \
 TRACK_B_EVAL=true \
+TRACK_B_RESET_WORKSPACE=true \
 VALIDATE_RESULT=false \
 make run-matrix
 
